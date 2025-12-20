@@ -1,0 +1,24 @@
+.idea/
+__pycache__/
+.DS_Store
+
+# airflow boilerplate (created automatically) and configs
+airflow-webserver.pid
+airflow.cfg
+airflow.db
+airflow.db-shm
+airflow.db-wal
+*.log
+airflow/logs/scheduler
+airflow.db-journal
+*.html
+simple_auth_manager_passwords.json.generated
+airflow/standalone_admin_password.txt
+airflow/logs/*
+
+# pixi environments
+.pixi
+*.egg-info
+
+# configuration files
+envvars.sh
