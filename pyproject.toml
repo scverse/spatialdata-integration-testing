@@ -1,0 +1,42 @@
+[project]
+authors = [{name = "Luca Marconato", email = "luca.marconato@scverse.org"}]
+name = "spatialdata-data-converter"
+requires-python = ">= 3.11"
+version = "0.1.0"
+#dependencies = [
+#    "spatialdata @ git+https://github.com/scverse/spatialdata.git@main",
+#    "spatialdata-io @ git+https://github.com/scverse/spatialdata-io.git@main",
+#    "spatialdata-plot @ git+https://github.com/scverse/spatialdata-plot.git@main",
+#    "spatialdata-notebooks @ git+https://github.com/scverse/spatialdata-notebooks.git@main",
+##    "spatialdata-notebooks @ git+https://github.com/srivarra/spatialdata-notebooks@table-queries",
+#    "napari-spatialdata @ git+https://github.com/scverse/napari-spatialdata.git@main",
+#    "squidpy @ git+https://github.com/scverse/squidpy.git@main",
+#]
+
+#[build-system]
+#build-backend = "hatchling.build"
+#requires = ["hatchling"]
+#
+#[tool.hatch.metadata]
+#allow-direct-references = true
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["osx-arm64"]
+
+[tool.pixi.pypi-dependencies]
+spatialdata_data_converter = { path = ".", editable = true }
+
+[tool.pixi.dependencies]
+nbconvert = ">=7.16.6,<8"
+pytest = ">=8.4.1,<9"
+jupyterlab = ">=4.4.5,<5"
+chardet = ">=5.2.0,<6"
+unzip = ">=6.0,<7"
+jupyter-black = ">=0.4.0,<0.5"
+pyproj = ">=3.7.1,<4"
+click = ">=8.2.2,<9"
+apache-airflow = ">=3.1.5,<4"
+
+[tool.pixi.tasks]
+pytest-spatialdata = "python -m pytest spatialdata"
