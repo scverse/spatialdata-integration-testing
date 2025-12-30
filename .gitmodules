@@ -1,0 +1,21 @@
+[submodule "dependencies/spatialdata"]
+	path = dependencies/spatialdata
+	url = https://github.com/scverse/spatialdata/
+[submodule "dependencies/spatialdata-io"]
+	path = dependencies/spatialdata-io
+	url = https://github.com/scverse/spatialdata-io/
+[submodule "dependencies/spatialdata-plot"]
+	path = dependencies/spatialdata-plot
+	url = https://github.com/scverse/spatialdata-plot/
+[submodule "dependencies/spatialdata-sandbox"]
+	path = dependencies/spatialdata-sandbox
+	url = https://github.com/giovp/spatialdata-sandbox/
+[submodule "dependencies/spatialdata-notebooks"]
+	path = dependencies/spatialdata-notebooks
+	url = https://github.com/scverse/spatialdata-notebooks/
+[submodule "dependencies/squidpy"]
+	path = dependencies/squidpy
+	url = https://github.com/scverse/squidpy/
+[submodule "dependencies/napari-spatialdata"]
+	path = dependencies/napari-spatialdata
+	url = https://github.com/scverse/napari-spatialdata/

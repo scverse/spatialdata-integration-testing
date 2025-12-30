@@ -34,3 +34,19 @@ update_repos_task = BashOperator(
     dag=dag_update_repos,
     retries=0,
 )
+
+# --------- create symlinks DAG ---------
+dag_create_symlinks = DAG(
+    'config_create_symlinks',
+    default_args=default_args,
+    description='Create symlinks between sandbox datasets and notebooks',
+    schedule=None,
+    catchup=False
+)
+
+create_symlinks_task = BashOperator(
+    task_id='create_symlinks',
+    bash_command=get_cli_command('create-symlinks'),
+    dag=dag_create_symlinks,
+    retries=0,
+)

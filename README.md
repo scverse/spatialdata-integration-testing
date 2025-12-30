@@ -36,6 +36,7 @@ The installation instructions are not heavily tested so be ready to adjust them 
    You need to have `pixi` available in your system.
    ```bash
    pixi install
+   pixi update
    ```
 4. Copy `template_envvars.sh` into `envvars.sh` and edit the 2 paths according to your system.
 5. Run `workflow_first_run.sh` with
@@ -75,6 +76,14 @@ export AIRFLOW_HOME=/absolute/path/to/spatialdata-data-converter/airflow
 ```bash
 pixi run airflow standalone
 ```
+When running the command above for the first time, it creates a configuration file in `$AIRFLOW_HOME/airflow.cfg`. After creating the configuration, the command starts the webserver and the scheduler.
+
+3. Manually change the configuration
+Set
+```python
+load_examples = False 
+```
+
 3. Open the dashboard.
 
    In your browser and go to `http://localhost:8080` to access the Airflow webserver.
