@@ -104,6 +104,13 @@ for dataset in Config.DATASETS:
             dag=download_all,
         )
 
+# Also trigger spatialdata-io datasets download
+trigger_spatialdata_io_datasets = TriggerDagRunOperator(
+    task_id='trigger_download_spatialdata_io_datasets_from_download_all',
+    trigger_dag_id='download_spatialdata_io_datasets',
+    dag=download_all,
+)
+
 # --------- convert all datasets to zarr ---------
 # Creation of a 'to_zarr_all' DAG that triggers all 'to_zarr_{dataset}' DAGs and is scheduled to run daily
 to_zarr_all = DAG(

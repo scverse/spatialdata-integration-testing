@@ -92,3 +92,6 @@ page_size = 100
 4. Login.
     
     For username and password follow the instructions printed in the terminal: search for "standalone | Password for the admin user has been previously generated in".
+
+# Known issues
+- The previous version of the repo used a serial executor for Airflow (i.e. no two tasks could be run in parallel). The current default configuration allows parallel execution. I may have spotted some problems during IO operations due to this but I am still investigating. Worst case we can sacrifice some performance and go back to serial execution.

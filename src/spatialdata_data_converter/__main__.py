@@ -8,6 +8,7 @@ import spatialdata_data_converter.config as sdcc  # we import this so if Config 
 from spatialdata_data_converter.utils import update_all_repos
 from spatialdata_data_converter.symlinker import make_all_symlinks
 from spatialdata_data_converter.uploader import upload_to_s3
+from pathlib import Path
 
 
 @click.group()
@@ -155,9 +156,47 @@ def run_reproducibility_notebook(notebook: str):
     )
 
 
-def _run_tests(repo, test_path):
+def _run_tests(repo, test_path, docker=None):
     """Run pytest for the given repo in dependencies, optionally on a specific test file."""
+    import platform
+    import subprocess
+
     repo_path = sdcc.Config.REPOSITORIES_FOLDER / repo
+
+    # Handle Docker option for spatialdata-plot
+    # docker=None (default): auto-detect, use Docker on macOS
+    # docker=True: force Docker
+    # docker=False: don't use Docker
+    use_docker = docker
+    if docker is None and repo == "spatialdata-plot":
+        # Auto-detect: use Docker on macOS
+        use_docker = platform.system() == "Darwin"
+        if use_docker:
+            print("Detected macOS, using Docker for spatialdata-plot tests.")
+
+    if use_docker and repo == "spatialdata-plot":
+        # Check if Docker image exists
+        result = subprocess.run(
+            ["docker", "images", "-q", "sit-spatialdata-plot:latest"],
+            capture_output=True,
+            text=True,
+        )
+        if not result.stdout.strip():
+            raise click.ClickException(
+                "Docker image 'sit-spatialdata-plot:latest' not found.\n"
+                "Please build it by running:\n\n"
+                f"  cd {repo_path}\n"
+                "  docker build --build-arg TARGETPLATFORM=linux/arm64 --tag sit-spatialdata-plot -f test.Dockerfile .\n"
+            )
+
+        # Run tests in Docker
+        docker_cmd = "docker run --rm sit-spatialdata-plot python -m pytest"
+        if test_path:
+            full_test_path = Path(ssdc.Config.REPOSITORIES_FOLDER) / 'spatialdata-plot' / 'tests' / test_path
+            docker_cmd += f" {full_test_path}"
+        subprocess.run(docker_cmd, shell=True, check=True)
+        return
+
     path = repo_path / "tests"
     if test_path:
         path = path / test_path
@@ -190,9 +229,14 @@ def _run_tests(repo, test_path):
     default=None,
     help="Optional path to a specific test file (relative to the repo's tests directory).",
 )
-def run_tests(repo, test_path):
+@click.option(
+    "--docker/--no-docker",
+    default=None,
+    help="Run tests in Docker. Default: auto-detect (use Docker on macOS for spatialdata-plot).",
+)
+def run_tests(repo, test_path, docker):
     """Run pytest for the given repo in dependencies, optionally on a specific test file."""
-    _run_tests(repo, test_path)
+    _run_tests(repo, test_path, docker)
 
 
 # @cli.command()
@@ -216,6 +260,14 @@ def update_dev_datasets():
     from spatialdata_data_converter.dev_datasets import update_dev_datasets_func
 
     update_dev_datasets_func()
+
+
+@cli.command()
+def download_spatialdata_io_dev_datasets():
+    """Download spatialdata-io dev/test datasets (from prepare_test_data.yaml workflow)."""
+    from spatialdata_data_converter.spatialdata_io_datasets import download_spatialdata_io_dev_datasets_func
+
+    download_spatialdata_io_dev_datasets_func()
 
 
 @cli.command()
