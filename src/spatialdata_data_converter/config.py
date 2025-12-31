@@ -56,12 +56,12 @@ class Config:
     # 'pr 329' for pull request 329
     # None for latest release
     REPOSITORIES = {
-        "spatialdata": None,
+        "spatialdata": 'main',
         "spatialdata-io": None,
-        "spatialdata-plot": None,
+        "spatialdata-plot": 'main',
         "napari-spatialdata": None,
         "spatialdata-notebooks": 'main',
-        "spatialdata-sandbox": None,
+        "spatialdata-sandbox": 'main',
         "squidpy": None,
     }
     S3_BUCKET_PATH = "embl-s3:/spatialdata/spatialdata-sandbox"
