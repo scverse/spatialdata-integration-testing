@@ -39,6 +39,7 @@ class Config:
         "spatialdata-notebooks/notebooks/developers_resources/storage_format",
     )
     DATASETS = [
+        "visium",  # symlinked to visium_brain
         "merfish",
         "mibitof",
         "mouse_liver",
@@ -59,7 +60,7 @@ class Config:
         "spatialdata-io": None,
         "spatialdata-plot": None,
         "napari-spatialdata": None,
-        "spatialdata-notebooks": None,
+        "spatialdata-notebooks": 'main',
         "spatialdata-sandbox": None,
         "squidpy": None,
     }

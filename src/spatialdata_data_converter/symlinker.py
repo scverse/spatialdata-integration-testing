@@ -50,13 +50,6 @@ def xenium_visium_make_symlinks():
 def transformations_symlinks():
     create_symlink(R / 'spatialdata-sandbox/mouse_liver/data.zarr', R / 'spatialdata-notebooks/notebooks/examples/mouse_liver.zarr')
 
-def napari_rois_make_symlinks():
-    create_symlink(R / 'spatialdata-sandbox/visium_associated_xenium_io/data_aligned.zarr', R / 'spatialdata-notebooks/notebooks/examples/visium_aligned.zarr')
-
-def densenet_make_symlinks():
-    create_symlink(R / 'spatialdata-sandbox/xenium_rep1_io/data_aligned.zarr', R / 'spatialdata-notebooks/notebooks/examples/xenium_aligned.zarr')
-    create_symlink(R / 'spatialdata-sandbox/visium_associated_xenium_io/data_aligned.zarr', R / 'spatialdata-notebooks/notebooks/examples/visium_aligned.zarr')
-
 
 def alignment_using_landmarks_make_symlinks():
     create_symlink(
@@ -116,14 +109,10 @@ def technology_spacem_make_symlinks():
     create_symlink(R / 'spatialdata-sandbox/spacem_helanih3t3/data.zarr', R / 'spatialdata-notebooks/notebooks/examples/spacem_helanih3t3.zarr')
 
 def make_symlinks(dataset: str):
-    if dataset == "xenium_visium":
-        return xenium_visium_make_symlinks
-    elif dataset in ['transformations', 'transformations_advanced']:
+    if dataset in ['transformations', 'transformations_advanced']:
         return transformations_symlinks
-    elif dataset == 'napari_rois':
-        return napari_rois_make_symlinks
-    elif dataset == 'densenet':
-        return densenet_make_symlinks
+    # elif dataset == "xenium_visium":
+    #     return xenium_visium_make_symlinks
     elif dataset == 'alignment_using_landmarks':
         return alignment_using_landmarks_make_symlinks
     elif dataset == "spatial_query":
@@ -138,8 +127,8 @@ def make_symlinks(dataset: str):
         return technology_mibitof_make_symlinks
     elif dataset == "technology_visium":
         return visium_brain_make_symlinks
-    elif dataset == 'speed_up_illustration':
-        return speed_up_illustration_make_symlinks
+    # elif dataset == 'speed_up_illustration':
+    #     return speed_up_illustration_make_symlinks
     elif dataset == 'technology_visium_hd':
         return technology_visium_hd_make_symlinks
     elif dataset == 'technology_xenium':
@@ -151,6 +140,6 @@ def make_symlinks(dataset: str):
 
 
 def make_all_symlinks():
-    # skipped: 'xenium_visium',
-    for dataset in ['transformations', 'transformations_advanced', 'napari_rois', 'densenet', 'alignment_using_landmarks', "spatial_query", "squidpy_integration", "technology_cosmx", "technology_merfish", "technology_mibitof", "technology_visium", 'speed_up_illustration', 'technology_visium_hd', 'technology_xenium', 'technology_spacem']:
+    # skipped: 'xenium_visium', 'speed_up_illustration'
+    for dataset in ['transformations', 'transformations_advanced', 'alignment_using_landmarks', "spatial_query", "squidpy_integration", "technology_cosmx", "technology_merfish", "technology_mibitof", "technology_visium", 'technology_visium_hd', 'technology_xenium', 'technology_spacem']:
         make_symlinks(dataset)()
