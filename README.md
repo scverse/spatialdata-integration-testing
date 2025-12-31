@@ -82,6 +82,7 @@ When running the command above for the first time, it creates a configuration fi
 Set
 ```python
 load_examples = False 
+page_size = 100
 ```
 
 3. Open the dashboard.

@@ -8,7 +8,7 @@ default_args = get_airflow_default_args()
 
 # List of notebooks
 # docs_notebooks = ['aggregation', 'transformations']
-EXCLUDED_NOTEBOOKS = ['technology_curio.ipynb', 'technology_stereoseq.ipynb', 'speed_up_illustration.ipynb']
+EXCLUDED_NOTEBOOKS = ['technology_curio.ipynb', 'technology_stereoseq.ipynb', 'speed_up_illustration.ipynb', 'technology_cosmx.ipynb']
 docs_notebooks = [s[:-len('.ipynb')] for s in os.listdir(Config.DOCS_NOTEBOOKS_FOLDER) if s.endswith('.ipynb') and s not in EXCLUDED_NOTEBOOKS]
 
 for notebook in docs_notebooks:
@@ -35,7 +35,7 @@ for notebook in docs_notebooks:
     globals()[dag_id] = dag
 
 # --------- call the symlinkers for specific datasets ---------
-for dataset in ['napari_rois', 'densenet', 'alignment_using_landmarks', 'spatial_query', 'squidpy_integration', 'technology_cosmx', 'technology_merfish', 'technology_mibitof', 'technology_visium', 'technology_visium_hd', 'technology_xenium', 'transformations', 'transformations_advanced', 'technology_spacem']:
+for dataset in ['napari_rois', 'densenet', 'alignment_using_landmarks', 'spatial_query', 'squidpy_integration', 'technology_merfish', 'technology_mibitof', 'technology_visium', 'technology_visium_hd', 'technology_xenium', 'transformations', 'transformations_advanced', 'technology_spacem']:
 
     globals()[f'symlinker_{dataset}'] = BashOperator(
         task_id=f'symlinker_{dataset}',

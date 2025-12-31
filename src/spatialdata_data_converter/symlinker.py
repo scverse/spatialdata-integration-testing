@@ -102,6 +102,9 @@ def speed_up_illustration_make_symlinks():
 def technology_visium_hd_make_symlinks():
      create_symlink(R / 'spatialdata-sandbox/visium_hd_3.0.0_io/data.zarr', R / 'spatialdata-notebooks/notebooks/examples/visium_hd.zarr')
 
+def technology_visium_hd_mouse_4_0_1_make_symlinks():
+        create_symlink(R / 'spatialdata-sandbox/visium_hd_4.0.1_io/data.zarr', R / 'spatialdata-notebooks/notebooks/examples/visium_hd_mouse_4.0.1.zarr')
+
 def technology_xenium_make_symlinks():
      create_symlink(R / 'spatialdata-sandbox/xenium_2.0.0_io/data.zarr', R / 'spatialdata-notebooks/notebooks/examples/xenium_2.0.0.zarr')
 
@@ -131,6 +134,8 @@ def make_symlinks(dataset: str):
     #     return speed_up_illustration_make_symlinks
     elif dataset == 'technology_visium_hd':
         return technology_visium_hd_make_symlinks
+    elif dataset == 'technology_visium_hd_mouse_4.0.1':
+        return technology_visium_hd_mouse_4_0_1_make_symlinks
     elif dataset == 'technology_xenium':
         return technology_xenium_make_symlinks
     elif dataset == 'technology_spacem':

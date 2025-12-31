@@ -46,6 +46,7 @@ class Config:
         "spacem_helanih3t3",
         "visium_associated_xenium_io",
         "visium_hd_3.0.0_io",
+        "visium_hd_4.0.1_io",
         "xenium_2.0.0_io",
         "xenium_rep1_io",
     ]
