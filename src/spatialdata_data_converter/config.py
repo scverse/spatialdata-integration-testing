@@ -99,7 +99,8 @@ def get_airflow_default_args():
 
 def get_cli_command(cli_args: str) -> str:
     """Build CLI command using pixi."""
-    return f'cd {Config.ROOT_FOLDER} && pixi run python -m spatialdata_data_converter {cli_args}'
+    # PYTHONUNBUFFERED=1 ensures real-time log output in Airflow UI
+    return f'cd {Config.ROOT_FOLDER} && PYTHONUNBUFFERED=1 pixi run python -m spatialdata_data_converter {cli_args}'
 
 
 if __name__ == "__main__":
