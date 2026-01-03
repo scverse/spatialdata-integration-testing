@@ -4,9 +4,7 @@ from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOpe
 from spatialdata_data_converter.config import get_airflow_default_args, get_cli_command
 
 default_args = get_airflow_default_args()
-TEST_REPOS = ["spatialdata", "spatialdata-plot", "spatialdata-io"]
-# "napari-spatialdata" is not tested since napari doesn't load on the remote headless machine (`napari` on the
-# terminal leads to a "Aborted (core dumped)")
+TEST_REPOS = ["spatialdata", "spatialdata-plot", "spatialdata-io", "napari-spatialdata"]
 
 for repo in TEST_REPOS:
     # --------- run tests for a single repository ---------

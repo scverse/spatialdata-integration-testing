@@ -92,7 +92,7 @@ download_all = DAG(
     'download_all',
     default_args=default_args,
     description='Trigger all the download tasks',
-    schedule='0 12 * * SUN',
+    schedule='0 12 1 * *',  # Monthly on the 1st at 12PM
     # schedule_interval=None,
     catchup=False
 )

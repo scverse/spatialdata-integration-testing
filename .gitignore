@@ -22,3 +22,6 @@ airflow/logs/*
 
 # configuration files
 envvars.sh
+
+# temp files
+temp/

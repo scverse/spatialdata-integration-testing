@@ -8,7 +8,7 @@ default_args = get_airflow_default_args()
 
 # List of notebooks
 # docs_notebooks = ['aggregation', 'transformations']
-EXCLUDED_NOTEBOOKS = ['technology_curio.ipynb', 'technology_stereoseq.ipynb', 'speed_up_illustration.ipynb', 'technology_cosmx.ipynb']
+EXCLUDED_NOTEBOOKS = ['technology_curio.ipynb', 'technology_stereoseq.ipynb', 'speed_up_illustration.ipynb', 'technology_cosmx.ipynb', '_latest_run_notebook.ipynb']
 docs_notebooks = [s[:-len('.ipynb')] for s in os.listdir(Config.DOCS_NOTEBOOKS_FOLDER) if s.endswith('.ipynb') and s not in EXCLUDED_NOTEBOOKS]
 
 for notebook in docs_notebooks:

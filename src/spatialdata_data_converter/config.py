@@ -58,9 +58,9 @@ class Config:
     # None for latest release
     REPOSITORIES = {
         "spatialdata": 'main',
-        "spatialdata-io": None,
+        "spatialdata-io": 'main',
         "spatialdata-plot": 'main',
-        "napari-spatialdata": None,
+        "napari-spatialdata": 'main',
         "spatialdata-notebooks": 'main',
         "spatialdata-sandbox": 'main',
         "squidpy": None,
