@@ -5,6 +5,8 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
+    options:
+      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       osx-arm64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/_python_abi3_support-1.0-hd8ed1ab_2.conda
@@ -3472,9 +3474,8 @@ packages:
 - pypi: ./
   name: spatialdata-data-converter
   version: 0.1.0
-  sha256: 1702f074e99291d882266792049e64bfcd5402d906d2247766691aac3914ce12
+  sha256: 54ff80b15bda17b19164f264f89ebaa1e143f199a635808730dff2de976d98fc
   requires_python: '>=3.11'
-  editable: true
 - conda: https://conda.anaconda.org/conda-forge/osx-arm64/sqlalchemy-2.0.45-py313h6535dbc_0.conda
   sha256: a29fe281099abcc3d6dc7237447c4a91c3fc1055b44060b82c7ab4df731a4516
   md5: 2532603c5078a85f654637be3135b42f
