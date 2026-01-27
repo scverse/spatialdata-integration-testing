@@ -35,7 +35,7 @@ for notebook in docs_notebooks:
     globals()[dag_id] = dag
 
 # --------- call the symlinkers for specific datasets ---------
-for dataset in ['napari_rois', 'densenet', 'alignment_using_landmarks', 'spatial_query', 'squidpy_integration', 'technology_merfish', 'technology_mibitof', 'technology_visium', 'technology_visium_hd', 'technology_xenium', 'transformations', 'transformations_advanced', 'technology_spacem']:
+for dataset in ['napari_rois', 'densenet', 'alignment_using_landmarks', 'spatial_query', 'squidpy_integration', 'technology_merfish', 'technology_mibitof', 'technology_visium', 'technology_visium_hd', 'technology_visium_hd_mouse_4.0.1', 'technology_xenium', 'transformations', 'transformations_advanced', 'technology_spacem']:
 
     globals()[f'symlinker_{dataset}'] = BashOperator(
         task_id=f'symlinker_{dataset}',
@@ -43,6 +43,28 @@ for dataset in ['napari_rois', 'densenet', 'alignment_using_landmarks', 'spatial
         dag=globals()[f'notebook_{dataset}'],
     )
     globals()[f'symlinker_{dataset}'] >> globals()[f'notebook_task_{dataset}']
+
+# --------- aggregation uses the transformations symlinker ---------
+globals()['symlinker_aggregation'] = BashOperator(
+    task_id='symlinker_aggregation',
+    bash_command=get_cli_command('create-symlinks --dataset transformations'),
+    dag=globals()['notebook_aggregation'],
+)
+globals()['symlinker_aggregation'] >> globals()['notebook_task_aggregation']
+
+globals()['symlinker_intro'] = BashOperator(
+    task_id='symlinker_intro',
+    bash_command=get_cli_command('create-symlinks --dataset transformations'),
+    dag=globals()['notebook_intro'],
+)
+globals()['symlinker_intro'] >> globals()['notebook_task_intro']
+
+globals()['symlinker_table_queries'] = BashOperator(
+    task_id='symlinker_table_queries',
+    bash_command=get_cli_command('create-symlinks --dataset technology_mibitof'),
+    dag=globals()['notebook_table-queries'],
+)
+globals()['symlinker_table_queries'] >> globals()['notebook_task_table-queries']
 
 # --------- run all the docs notebooks (lightweight) ---------
 notebook_docs_all = DAG(

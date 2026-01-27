@@ -19,34 +19,6 @@ def create_symlink(src, dst):
     print(f"Symlink created at {dst} pointing to {src}.")
 
 
-def xenium_visium_make_symlinks():
-    create_symlink(
-        R / "spatialdata-sandbox",
-        R / "spatialdata-notebooks/notebooks/paper_reproducibility/spatialdata-sandbox",
-    )
-
-    # download data needed for the xenium_visium notebook
-    for file in [
-        "BC_atlas_xe.h5ad",
-        "manual_annotations.zarr.zip",
-        "sandbox.zarr.zip",
-        "visium_annotated_cell2location.h5ad",
-        "visium_copyKat.h5ad",
-    ]:
-        f = (
-            f"rclone -v copy embl-s3:spatialdata/spatialdata-sandbox/generated_data/xenium_visium_integration/{file} "
-            + str(R / "spatialdata-sandbox/generated_data/xenium_visium_integration/")
-        )
-        run_subprocess(cmd=f, env=sdcc.Config.ENV, update_repos=False)
-    zip_path = (
-        R
-        / "spatialdata-sandbox/generated_data/xenium_visium_integration/sandbox.zarr.zip"
-    )
-    out_path = R / "spatialdata-sandbox/generated_data/xenium_visium_integration/"
-    run_subprocess(
-        cmd=f'unzip -o "{zip_path}" -d "{out_path}"', env=sdcc.Config.ENV, update_repos=False
-    )
-
 def transformations_symlinks():
     create_symlink(R / 'spatialdata-sandbox/mouse_liver/data.zarr', R / 'spatialdata-notebooks/notebooks/examples/mouse_liver.zarr')
 
@@ -82,13 +54,6 @@ def squidpy_integration_make_symlinks():
     create_symlink(
         R / "spatialdata-sandbox/xenium_rep1_io/data.zarr",
         R / "spatialdata-notebooks/notebooks/examples/xenium.zarr",
-    )
-
-
-def technology_cosmx_make_symlinks():
-    create_symlink(
-        R / "spatialdata-sandbox/cosmx_io/data.zarr",
-        R / "spatialdata-notebooks/notebooks/examples/cosmx.zarr",
     )
 
 
@@ -131,8 +96,6 @@ def make_symlinks(dataset: str):
         return visium_brain_make_symlinks
     elif dataset == "squidpy_integration":
         return squidpy_integration_make_symlinks
-    elif dataset == "technology_cosmx":
-        return technology_cosmx_make_symlinks
     elif dataset == "technology_merfish":
         return technology_merfish_make_symlinks
     elif dataset == "technology_mibitof":
@@ -154,5 +117,5 @@ def make_symlinks(dataset: str):
 
 
 def make_all_symlinks():
-    for dataset in ['transformations', 'densenet', 'transformations_advanced', 'alignment_using_landmarks', "spatial_query", "napari_rois", "squidpy_integration", "technology_cosmx", "technology_merfish", "technology_mibitof", "technology_visium", 'technology_visium_hd', 'technology_visium_hd_mouse_4.0.1', 'technology_xenium', 'technology_spacem']:
+    for dataset in ['transformations', 'densenet', 'transformations_advanced', 'alignment_using_landmarks', "spatial_query", "napari_rois", "squidpy_integration", "technology_merfish", "technology_mibitof", "technology_visium", 'technology_visium_hd', 'technology_visium_hd_mouse_4.0.1', 'technology_xenium', 'technology_spacem']:
         make_symlinks(dataset)()
