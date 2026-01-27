@@ -4784,7 +4784,7 @@ packages:
 - pypi: ./
   name: spatialdata-data-converter
   version: 0.1.0
-  sha256: e5bf65aa085e9c6150c00ce21fa0a3e3e1c01e4b927e74f621a58ad4afebdbc7
+  sha256: 4b414e502e969701c5983980fd692213a91a75119e2e7b860cd6add9de3a9f15
   requires_python: '>=3.11'
 - conda: https://conda.anaconda.org/conda-forge/linux-64/sqlalchemy-2.0.46-py313h54dd161_1.conda
   sha256: ac8799280546a9dcdbfaefe3ae2a357ae05c89242c26831a7261b6e19e371c14
