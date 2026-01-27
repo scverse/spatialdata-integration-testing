@@ -83,6 +83,8 @@ Set
 ```python
 load_examples = False 
 page_size = 100
+scheduler_heartbeat_sec = 2                           
+scheduler_idle_sleep_time = 0.5 
 ```
 You may have to delete the database file `$AIRFLOW_HOME/airflow.db` to clean up the example DAGs.
 

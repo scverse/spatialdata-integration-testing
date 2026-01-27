@@ -84,11 +84,11 @@ echo "Script path: $SCRIPT_PATH"
 echo "Path of the spatialdata-data-converter package: $PACKAGE_PATH"
 
 # # 4. Use the absolute path in pip install commands
-# install squidpy first to avoid overriding local dependencies
-pip install -e "$PACKAGE_PATH/dependencies/squidpy[test]"
+# install spatialdata first so other packages use local version instead of PyPI
 pip install -e "$PACKAGE_PATH/dependencies/spatialdata[test,docs]"
 pip install -e "$PACKAGE_PATH/dependencies/spatialdata-io[test,doc]"
 pip install -e "$PACKAGE_PATH/dependencies/spatialdata-plot[test]"
 pip install -e "$PACKAGE_PATH/dependencies/napari-spatialdata[test]"
+pip install -e "$PACKAGE_PATH/dependencies/squidpy[test]"
 # pip install squidpy
 echo "success!"
