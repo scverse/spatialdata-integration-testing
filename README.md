@@ -98,31 +98,32 @@ You may have to delete the database file `$AIRFLOW_HOME/airflow.db` to clean up 
 
 6. First run of DAGs.
 
-    When running the DAGs for the first time, they should be executed in the following order:
+    **Recommended:** Use the orchestrator DAG `0_orchestrator_first_run` which automatically runs the following sequence:
     1. `config_update_repos`
     2. `config_create_symlinks`
     3. `config_install_env`
+    4. `download_all`
 
-7. Configuration complete.
+    Alternatively, you can run these DAGs manually in the order listed above.
 
-    1. Run `download_all` to download all necessary data. 
+7. Testing workflow.
 
-8. Testing workflow.
+    **Recommended:** Use the orchestrator DAG `0_orchestrator_test_workflow` which automatically runs the following sequence:
+    1. `config_update_repos` (ensure repos are up-to-date)
+    2. `config_install_env` (ensure environment is current)
+    3. `tests_all`
+    4. `to_zarr_all`
+    5. `notebook_docs_all`
 
-    To test run the following DAGs in order (note: we are not re-downloading the data):
-    1. Re-run `config_update_repos` to ensure repositories are up-to-date
-    2. Re-run `config_install_env` to ensure the environment is current
-    3. Run `tests_all`
-    4. Run `to_zarr_all`
-    5. Run `notebook_docs_all`
-    
-9. Upload data.
+    Alternatively, you can run these DAGs manually in the order listed above.
 
-    If all tests pass successfully, you can run:
-    1.`upload_all` to upload the data (note: this DAG is still a work in progress).
+8. Upload data.
+
+    If all tests pass successfully, you can run `upload_all` to upload the data to S3.
 
     **Notes:**
     - The `update_dev_dataset` DAG will run automatically daily, so there's no need to manually trigger it.
+    - The orchestrator DAGs (`0_orchestrator_*`) appear first in the Airflow DAG list for easy access.
 
 # Known issues
 - The previous version of the repo used a serial executor for Airflow (i.e. no two tasks could be run in parallel). The current default configuration allows parallel execution. I may have spotted some problems during IO operations due to this but I am still investigating. Worst case we can sacrifice some performance and go back to serial execution.

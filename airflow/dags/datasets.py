@@ -127,18 +127,17 @@ for dataset in Config.DATASETS:
         dag=to_zarr_all,
     )
 
-# # --------- upload all datasets to s3 ---------
-# disabled because we don't really use it and each dataset uploader is triggered by the respective to_zarr anyway
-# upload_all = DAG(
-#     'upload_all',
-#     default_args=default_args,
-#     description='Trigger all the upload tasks',
-#     schedule=None,
-#     catchup=False
-# )
-# for dataset in Config.DATASETS:
-#     trigger = TriggerDagRunOperator(
-#         task_id=f'trigger_upload_{dataset}_from_upload_all',
-#         trigger_dag_id=f'upload_{dataset}',
-#         dag=upload_all,
-#     )
+# --------- upload all datasets to s3 ---------
+upload_all = DAG(
+    'upload_all',
+    default_args=default_args,
+    description='Trigger all the upload tasks',
+    schedule=None,
+    catchup=False
+)
+for dataset in Config.DATASETS:
+    trigger = TriggerDagRunOperator(
+        task_id=f'trigger_upload_{dataset}_from_upload_all',
+        trigger_dag_id=f'upload_{dataset}',
+        dag=upload_all,
+    )
