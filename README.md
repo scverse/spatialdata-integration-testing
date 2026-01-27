@@ -25,7 +25,7 @@ The installation instructions are not heavily tested so be ready to adjust them 
 
 1. Clone the repository, including the submodules:
     ```bash
-    git clone --recurse-submodules https://github.com/LucaMarconato/spatialdata-data-converter.git 
+    git clone --recurse-submodules https://github.com/scverse/spatialdata-integration-testing.git 
     ```
 
 2. Go to the cloned directory:
@@ -70,7 +70,7 @@ The installation instructions are not heavily tested so be ready to adjust them 
 1. Configure the Airflow home directory.
 In your `~/.zshrc` file (or depending on your system `~/.bashrc`, `~/.bash_profile`, ...), add the following lines (remember to change the path):
 ```bash
-export AIRFLOW_HOME=/absolute/path/to/spatialdata-data-converter/airflow
+export AIRFLOW_HOME=/absolute/path/to/spatialdata-integration-testing/airflow
 ```
 2. Run Airflow
 ```bash
