@@ -61,19 +61,3 @@ for notebook in docs_notebooks:
         trigger_dag_id=f'notebook_{notebook}',
         dag=notebook_docs_all,
     )
-
-# --------- run all the paper notebooks (heavy) ---------
-# both notebooks are removed from the DAG:
-# - the lundeberg notebook is heavy and not worth testing routinely on our limited resources
-# - the xenium visium notebook is important but it doesn't work on the small performant machine; we will test
-#   it locally manually when needed
-notebook_paper_all = DAG(
-    'notebook_paper_all',
-    default_args=default_args,
-    description='Trigger all the notebook tasks for paper notebooks (heavy)',
-    # once per week (Sun) at 12PM
-    schedule='0 12 * * SUN',
-    # schedule=None,
-    # schedule_interval='@daily',
-    catchup=False
-)
