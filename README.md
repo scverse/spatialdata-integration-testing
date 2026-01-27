@@ -84,12 +84,13 @@ Set
 load_examples = False 
 page_size = 100
 ```
+You may have to delete the database file `$AIRFLOW_HOME/airflow.db` to clean up the example DAGs.
 
-3. Open the dashboard.
+4. Open the dashboard.
 
    In your browser and go to `http://localhost:8080` to access the Airflow webserver.
    If it doesn't work, check the terminal output for the correct port.
-4. Login.
+5. Login.
     
     For username and password follow the instructions printed in the terminal: search for "standalone | Password for the admin user has been previously generated in".
 
