@@ -22,7 +22,7 @@ version = "0.1.0"
 
 [tool.pixi.workspace]
 channels = ["conda-forge"]
-platforms = ["osx-arm64"]
+platforms = ["osx-arm64", "linux-64"]
 
 [tool.pixi.pypi-dependencies]
 spatialdata_data_converter = { path = ".", editable = true }
