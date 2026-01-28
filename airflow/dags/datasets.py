@@ -50,14 +50,6 @@ for dataset in Config.DATASETS:
     # Assign the dag object to a variable that complies with Airflow's naming conventions
     globals()[dag_id] = dag
 
-    if dataset not in Config.DATASETS_NO_DOWNLOAD:
-        trigger_to_zarr_dag = TriggerDagRunOperator(
-            task_id=f'trigger_to_zarr_{dataset}_from_download_{dataset}',
-            trigger_dag_id=f'to_zarr_{dataset}',
-            dag=globals()[f'download_{dataset}'],
-        )
-        run_download_script >> trigger_to_zarr_dag
-
     # --------- upload a single dataset to s3 ---------
     dag_id = f'upload_{dataset}'
 
@@ -79,13 +71,6 @@ for dataset in Config.DATASETS:
     # Assign the dag object to a variable that complies with Airflow's naming conventions
     globals()[dag_id] = dag
 
-    trigger_upload_dag = TriggerDagRunOperator(
-        task_id=f'trigger_upload_{dataset}_from_to_zarr_{dataset}',
-        trigger_dag_id=f'upload_{dataset}',
-        dag=globals()[f'to_zarr_{dataset}'],
-    )
-    run_to_zarr_script >> trigger_upload_dag
-
 # --------- download all datasets ---------
 # Creation of a 'download_all' DAG that triggers all 'download_{dataset}' DAGs
 download_all = DAG(
@@ -101,6 +86,7 @@ for dataset in Config.DATASETS:
         trigger = TriggerDagRunOperator(
             task_id=f'trigger_download_{dataset}_from_download_all',
             trigger_dag_id=f'download_{dataset}',
+            wait_for_completion=True,
             dag=download_all,
         )
 
@@ -108,6 +94,7 @@ for dataset in Config.DATASETS:
 trigger_spatialdata_io_datasets = TriggerDagRunOperator(
     task_id='trigger_download_spatialdata_io_datasets_from_download_all',
     trigger_dag_id='download_spatialdata_io_datasets',
+    wait_for_completion=True,
     dag=download_all,
 )
 
@@ -124,6 +111,7 @@ for dataset in Config.DATASETS:
     trigger = TriggerDagRunOperator(
         task_id=f'trigger_to_zarr_{dataset}_from_to_zarr_all',
         trigger_dag_id=f'to_zarr_{dataset}',
+        wait_for_completion=True,
         dag=to_zarr_all,
     )
 
@@ -139,5 +127,6 @@ for dataset in Config.DATASETS:
     trigger = TriggerDagRunOperator(
         task_id=f'trigger_upload_{dataset}_from_upload_all',
         trigger_dag_id=f'upload_{dataset}',
+        wait_for_completion=True,
         dag=upload_all,
     )

@@ -44,5 +44,6 @@ for repo in TEST_REPOS:
     trigger = TriggerDagRunOperator(
         task_id=f'trigger_tests_{repo}_from_tests_all',
         trigger_dag_id=f'tests_{repo}',
+        wait_for_completion=True,
         dag=tests_all,
     )

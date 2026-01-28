@@ -81,5 +81,6 @@ for notebook in docs_notebooks:
     trigger = TriggerDagRunOperator(
         task_id=f'trigger_notebook_{notebook}_from_notebook_docs_all',
         trigger_dag_id=f'notebook_{notebook}',
+        wait_for_completion=True,
         dag=notebook_docs_all,
     )
