@@ -140,3 +140,22 @@ Follow the prerequisites from the [Installation (Airflow)](#installation-airflow
     ```bash
     bash src/spatialdata_data_converter/workflow_upload_data_for_release.sh
     ```
+## Some screenshots
+
+### DAG list for manual execution, schedule and status
+![DAG list with manual and scheduled execution](screenshots/manual%20and%20scheduled%20execution.png)
+
+### "Test workflow" DAG
+![DAG for the test workflow](screenshots/dag%20test%20all.png)
+
+### "To Zarr" DAG
+![Example to_zarr DAGs](screenshots/example%20to%20zarr%20dags.png)
+
+### History of runs for each DAG
+![Previous DAG runs](screenshots/previous%20run%20dags.png)
+
+### Latest DAG runs
+![Old DAG runs](screenshots/old%20dag%20runs.png)
+
+### Gantt chart for the "Test workflow" DAG
+![Gantt chart of a workflow run](screenshots/gantt.png)
