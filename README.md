@@ -14,6 +14,11 @@ This repository contains a series of scripts that can be orchestrated with Airfl
 - Manual execution, sequentially. Run jobs in a series of bash scripts. Simple to understand, to run, to debug.
 - Manual execution, parallelized. Run jobs in parallel using a simple bash function to spin multiple processes. Simple and fast. More fragile than a sequential run.
 
+## Motivation
+- Why Airflow and not GitHub Actions? Cost, speed, configurability, debuggability. This pipeline requires no warmup (datasets are alredy downloaded and we can reuse environments if we want), we can express complex workflows, and also we can easily get more storage, CPU, memory and even GPU if needed. Finally debugging problems locally it's smoother than on GitHub Actions.
+- Limitations of Airflow: GitHub Actions offer a simpler experience. So we could consider moving lightweights tasks to GitHub Actions and keep the Airflow pipeline only for heavy/complex workflows.
+- Alternatives to Airflow: Flyte, Prefect, Nextflow. We chose Airflow because it's both very mature and free.
+
 ## Usage instructions (Airflow)
 If you have access to remote machine, everything is already setup.
 
