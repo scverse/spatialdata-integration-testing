@@ -150,6 +150,13 @@ Follow the prerequisites from the [Installation (Airflow)](#installation-airflow
     bash src/spatialdata_data_converter/workflow_update_data_for_release.sh <spatialdata-version> <spatialdata-io-version>
     ```
     After the upload is successful, manually add the new version entry in `dependencies/spatialdata-notebooks/datasets/README.md` so that the download link appears in the docs.
+## Future improvements
+### Upload process
+- [ ] The `spatialdata-io` version should be added to the `sdata.zarr` metadata.
+- [ ] The upload script should read the `spatialdata` version and `spatialdata-io` version from the metadata.
+- [ ] The upload task should be re-added to the DAG.
+- [ ] There should still be the optoin to run the upload manually before making a release.
+
 ## Some screenshots
 
 ### DAG list for manual execution, schedule and status
