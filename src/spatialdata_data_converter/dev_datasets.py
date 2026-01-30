@@ -47,7 +47,7 @@ def update_dev_datasets_func(update_repos: bool = False):
         print("CHANGES DETECTED")
         cmd = (
             f"cd {sdcc.Config.DEV_DATASETS_FOLDER} && "
-            f"git commit -m '{commit_message}' && git push "
+            f"git commit -m '{commit_message}' && git pull && git push "
         )
         _ = run_subprocess(cmd, env=sdcc.Config.ENV, update_repos=False)
     else:
