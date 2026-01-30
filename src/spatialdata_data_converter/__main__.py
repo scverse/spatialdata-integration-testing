@@ -259,7 +259,7 @@ def update_dev_datasets():
     """Update development datasets."""
     from spatialdata_data_converter.dev_datasets import update_dev_datasets_func
 
-    update_dev_datasets_func()
+    update_dev_datasets_func(update_repos=True)
 
 
 @cli.command()

@@ -2,22 +2,21 @@ import re
 
 from spatialdata_data_converter.subprocess_runner import run_notebook, run_subprocess
 import spatialdata_data_converter.config as sdcc
+from spatialdata_data_converter.utils import update_repo
 
 
 def update_dev_datasets_func(update_repos: bool = False):
     notebooks = ["multiple_elements"]
+    update_repo(repo_name='spatialdata-notebooks', branch=sdcc.Config.REPOSITORIES['spatialdata-notebooks'])
     # update all the datasets
     for notebook in notebooks:
         run_notebook(
             notebook_folder=sdcc.Config.DEV_DATASETS_FOLDER,
             notebook=notebook,
             env=sdcc.Config.ENV,
-            update_repos=update_repos,
+            update_repos=False,
             run_inplace=True,
         )
-        # update only once
-        if update_repos:
-            update_repos = False
     # commit the changes
     cmd = f"python -c \\\"from spatialdata import __version__; print('BEGIN' + __version__ + 'END')\\\" "
     spatialdata_version_raw = run_subprocess(cmd, env=sdcc.Config.ENV, update_repos=False)
@@ -47,7 +46,7 @@ def update_dev_datasets_func(update_repos: bool = False):
         print("CHANGES DETECTED")
         cmd = (
             f"cd {sdcc.Config.DEV_DATASETS_FOLDER} && "
-            f"git commit -m '{commit_message}' && git pull && git push "
+            f"git commit -m '{commit_message}' && git push "
         )
         _ = run_subprocess(cmd, env=sdcc.Config.ENV, update_repos=False)
     else:
