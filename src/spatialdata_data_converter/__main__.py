@@ -282,10 +282,10 @@ def download_spatialdata_io_dev_datasets():
 )
 @click.option(
     "--dataset-suffix",
-    default="",
-    help="Optional suffix for the dataset name, e.g., '_dev'.",
+    default="_dev",
+    help="Suffix for the dataset name, e.g., '_dev' or '_spatialdata_v0.7.0_spatialdata_io_v0.6.0'. Default: '_dev'.",
 )
-def upload(dataset: str, zarr_name: str = "data.zarr", dataset_suffix: str = ""):
+def upload(dataset: str, zarr_name: str = "data.zarr", dataset_suffix: str = "_dev"):
     """Upload dataset to S3."""
 
     if not dataset:

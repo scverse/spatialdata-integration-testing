@@ -43,9 +43,13 @@ If you have access to remote machine, everything is already setup.
 
     Each stage waits for all jobs from the previous stage to complete before starting. Jobs within each stage run in parallel.
 
-3. **Upload data (after successful tests).**
+3. **Upload data (right before a release).**
 
-    If all tests pass successfully, after making a release, run `upload_all` to upload the data to S3. 
+    Upload is done manually via the command line (not via Airflow). Once tests pass and you are ready to release, upload the data right before making the release:
+    ```bash
+    bash src/spatialdata_data_converter/workflow_update_data_for_release.sh <spatialdata-version> <spatialdata-io-version>
+    ```
+    After the upload is successful, manually add the new version entry in `dependencies/spatialdata-notebooks/datasets/README.md` so that the download link appears in the docs.
 
 **Notes:**
 - The `update_dev_dataset` DAG will run automatically daily, so there's no need to manually trigger it (it is not triggered by the above).
@@ -141,10 +145,11 @@ Follow the prerequisites from the [Installation (Airflow)](#installation-airflow
     bash src/spatialdata_data_converter/invoke_cli.sh
     ```
 
-4. After making a release, please upload the new datasets to S3 by running:
+4. Right before making a release, upload the new datasets to S3 by running:
     ```bash
-    bash src/spatialdata_data_converter/workflow_upload_data_for_release.sh
+    bash src/spatialdata_data_converter/workflow_update_data_for_release.sh <spatialdata-version> <spatialdata-io-version>
     ```
+    After the upload is successful, manually add the new version entry in `dependencies/spatialdata-notebooks/datasets/README.md` so that the download link appears in the docs.
 ## Some screenshots
 
 ### DAG list for manual execution, schedule and status

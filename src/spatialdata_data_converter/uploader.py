@@ -44,22 +44,9 @@ def _get_remote_checksum(dataset: str, dataset_suffix: str) -> int:
 
 
 def _upload_data(dataset: str, zarr_name: str, dataset_suffix: str) -> None:
-    # check if old zip exists (deletefile will fail if the file doesn't exist)
-    bash_command = (
-        f"cd {sdcc.full_path_of_sandbox_file(dataset)} && "
-        f'rclone -v lsf {sdcc.Config.S3_BUCKET_PATH}/{dataset}{dataset_suffix}.zip --password-command \\"echo $ABCR8\\" '
-    )
-    output = run_subprocess(cmd=bash_command, env=sdcc.Config.ENV, update_repos=False)
-
-    # remove old zip (in theory not needed, but let's be explicit)
-    print(f'output of lsf: "{output}"')
-    if output == f"{dataset}{dataset_suffix}.zip\n":
-        bash_command = (
-            f"cd {sdcc.full_path_of_sandbox_file(dataset)} && "
-            f'rclone -v deletefile {sdcc.Config.S3_BUCKET_PATH}/{dataset}{dataset_suffix}.zip --password-command \\"echo $ABCR8\\" '
-        )
-        output = run_subprocess(cmd=bash_command, env=sdcc.Config.ENV, update_repos=False)
-
+    # rclone copy overwrites the existing file; S3 handles this atomically
+    # (the old object remains available until the new upload completes),
+    # so there is no need to delete the old file first.
     bash_command = (
         f"cd {sdcc.full_path_of_sandbox_file(dataset)} && "
         # upload zip
