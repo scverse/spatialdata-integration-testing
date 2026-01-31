@@ -43,14 +43,13 @@ If you have access to remote machine, everything is already setup.
 
     Each stage waits for all jobs from the previous stage to complete before starting. Jobs within each stage run in parallel.
 
-3. **Upload data (after a release).**
+3. **Upload data (before a release).**
 
-    After making the release:
-    1. Set `spatialdata` and `spatialdata-io` to `None` in `src/spatialdata_data_converter/config.py` so they use the latest release.
-    2. Run the full test workflow (`0_orchestrator_test_workflow`). This is necessary because the `to_zarr` step writes the `spatialdata` and `spatialdata-io` versions into the zarr metadata, which is then used to name the uploaded files.
-    3. Trigger the `upload_all` DAG. The version suffix is automatically inferred from the zarr metadata.
+    After all tests pass (step 2), trigger the `upload_all` DAG. The version suffix is automatically inferred from the zarr metadata. Then proceed with the release.
 
     After the upload is successful, manually add the new version entry in `dependencies/spatialdata-notebooks/datasets/README.md` so that the download link appears in the docs.
+
+    See the [Note on upload timing and version strings](#note-on-upload-timing-and-version-strings) section below for caveats.
 
 **Notes:**
 - The `update_dev_dataset` DAG will run automatically daily, so there's no need to manually trigger it (it is not triggered by the above).
@@ -147,12 +146,35 @@ Follow the prerequisites from the [Installation (Airflow)](#installation-airflow
     bash src/spatialdata_data_converter/invoke_cli.sh
     ```
 
-4. After making a release, upload the new datasets to S3:
-    1. Set `spatialdata` and `spatialdata-io` to `None` in `src/spatialdata_data_converter/config.py` so they use the latest release.
-    2. Re-run the test workflow (steps 1–3 above) so that the zarr metadata contains the released versions.
-    3. Upload via `pixi run python -m spatialdata_data_converter upload --dataset <name>` for each dataset. The version suffix is automatically inferred from zarr metadata.
+4. After all tests pass (step 3), upload the new datasets to S3 via `pixi run python -m spatialdata_data_converter upload --dataset <name>` for each dataset. The version suffix is automatically inferred from zarr metadata. Then proceed with the release.
 
     After the upload is successful, manually add the new version entry in `dependencies/spatialdata-notebooks/datasets/README.md` so that the download link appears in the docs.
+
+    See the [Note on upload timing and version strings](#note-on-upload-timing-and-version-strings) section below for why we upload before the release rather than after.
+
+## Note on upload timing and version strings
+
+We upload datasets before making a release. This means the version strings in the uploaded file names will look like `spatialdata_0.7.0a1.dev2+gc70554d2e` instead of a clean `spatialdata_0.7.1`. Here is why.
+
+**The problem:**
+
+1. The list of downloadable converted datasets shown in the stable docs is generated as a static list when Read the Docs builds the documentation (to avoid a problem with CORS).
+2. The stable docs are only built on release.
+3. Before making a release, the `spatialdata` and `spatialdata-io` versions in `config.py` point to `main` (because we release from the main branch). The `to_zarr` step writes these versions into the zarr metadata, so the version suffix ends up being a pre-release dev string (e.g. `spatialdata_0.7.0a1.dev2+gc70554d2e`).
+
+**Why not upload after the release?**
+
+In theory, after making the release we could set `spatialdata` and `spatialdata-io` to `None` in `config.py` (which uses the latest release), re-run the full pipeline, and then upload with clean version strings. However:
+- The dataset list in the stable docs would not include the new datasets, because the docs were already built at release time. A new release would be needed just to update the list.
+- Re-running the full pipeline takes a significant amount of time.
+
+**Current solution:**
+
+We accept the ugly pre-release version strings and upload whenever the tests pass before making a release.
+
+**Possible future improvement:**
+
+The dataset list in the docs could be generated dynamically (e.g. fetched from S3 at page load) instead of being a static list built at docs build time. Even with this change, getting clean version strings would still require either re-running the pipeline after release or manually specifying the release version string.
 
 ## Some screenshots
 
