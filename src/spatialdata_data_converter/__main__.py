@@ -280,18 +280,45 @@ def download_spatialdata_io_dev_datasets():
     default="data.zarr",
     help="Name of the zarr file to upload (default: data.zarr).",
 )
-@click.option(
-    "--dataset-suffix",
-    default="_dev",
-    help="Suffix for the dataset name, e.g., '_dev' or '_spatialdata_v0.7.0_spatialdata_io_v0.6.0'. Default: '_dev'.",
-)
-def upload(dataset: str, zarr_name: str = "data.zarr", dataset_suffix: str = "_dev"):
+def upload(dataset: str, zarr_name: str = "data.zarr"):
     """Upload dataset to S3."""
 
     if not dataset:
         raise click.ClickException("Dataset name is required.")
 
-    upload_to_s3(dataset=dataset, zarr_name=zarr_name, dataset_suffix=dataset_suffix)
+    upload_to_s3(dataset=dataset, zarr_name=zarr_name)
+
+
+@cli.command()
+def clean_airflow():
+    """Delete all Airflow DAG runs with state 'running' or 'queued' and their task instances."""
+    # TODO: doing a quick test this function doesn't seem to be working. Check and fix.
+    from airflow.models.dagrun import DagRun
+    from airflow.models.taskinstance import TaskInstance
+    from airflow.utils.session import create_session
+
+    states_to_clean = ["running", "queued"]
+
+    with create_session() as session:
+        dag_runs = session.query(DagRun).filter(
+            DagRun.state.in_(states_to_clean)
+        ).all()
+
+        n_runs = len(dag_runs)
+        n_tasks = 0
+
+        for run in dag_runs:
+            deleted = session.query(TaskInstance).filter(
+                TaskInstance.dag_id == run.dag_id,
+                TaskInstance.run_id == run.run_id,
+            ).delete(synchronize_session="fetch")
+            n_tasks += deleted
+            click.echo(f"  Deleting: {run.dag_id} (run_id={run.run_id}, state={run.state}), {deleted} task instances")
+            session.delete(run)
+
+        session.commit()
+
+    click.echo(f"\nDeleted {n_runs} DAG runs and {n_tasks} task instances.")
 
 
 if __name__ == "__main__":

@@ -37,6 +37,7 @@ jupyter-black = ">=0.4.0,<0.5"
 pyproj = ">=3.7.1,<4"
 click = ">=8.2.2,<9"
 apache-airflow = ">=3.1.5,<4"
+zarr = ">=3.1.5,<4"
 
 [tool.pixi.tasks]
 pytest-spatialdata = "python -m pytest spatialdata"
@@ -55,3 +56,4 @@ run-tests = "python -m spatialdata_data_converter run-tests"
 update-dev-datasets = "python -m spatialdata_data_converter update-dev-datasets"
 download-spatialdata-io-dev-datasets = "python -m spatialdata_data_converter download-spatialdata-io-dev-datasets"
 upload = "python -m spatialdata_data_converter upload"
+clean-airflow = "python -m spatialdata_data_converter clean-airflow"

@@ -1,5 +1,8 @@
 from spatialdata_data_converter.subprocess_runner import run_subprocess
 import spatialdata_data_converter.config as sdcc
+from pathlib import Path
+import zarr
+from zarr.storage import LocalStore
 
 def _zip_dataset(dataset: str, zarr_name: str, dataset_suffix: str) -> None:
     bash_command = (
@@ -68,8 +71,10 @@ def _upload_checksum(dataset: str, checksum: int, dataset_suffix: str) -> None:
 
 
 def upload_to_s3(
-    dataset: str, zarr_name: str = "data.zarr", dataset_suffix: str = ""
+    dataset: str, zarr_name: str = "data.zarr",
 ) -> None:
+    sdata_path = Path(sdcc.full_path_of_sandbox_file(dataset)) / zarr_name
+    dataset_suffix = get_data_versions_suffix(sdata_path=sdata_path)
     _zip_dataset(dataset, zarr_name, dataset_suffix)
     checksum = _compute_checksum(dataset, dataset_suffix)
 
@@ -93,6 +98,21 @@ def upload_to_s3(
     else:
         print("the remote data is already up-to-date")
 
+def get_data_versions_suffix(sdata_path: Path) -> str:
+    store = LocalStore(str(sdata_path))
+    group = zarr.open(store=store, mode='r')
+    spatialdata_attrs = group.attrs.get("spatialdata_attrs")
+    if spatialdata_attrs is None:
+        raise ValueError("spatialdata_attrs not found in the metadata")
+    spatialdata_software_version = spatialdata_attrs.get("spatialdata_software_version")
+    if spatialdata_software_version is None:
+        raise ValueError("spatialdata version not found in the metadata")
+    spatialdata_io_software_version = group.attrs.get("spatialdata_io_software_version")
+    if spatialdata_io_software_version is None:
+        suffix = f'_spatialdata_{spatialdata_software_version}'
+    else:
+        suffix = f'_spatialdata_{spatialdata_software_version}_spatialdata_io_{spatialdata_io_software_version}'
+    return suffix
 
 if __name__ == "__main__":
-    upload_to_s3(dataset="visium", zarr_name="data.zarr", dataset_suffix="_dev")
+    upload_to_s3(dataset="xenium_rep1_io", zarr_name="data.zarr")

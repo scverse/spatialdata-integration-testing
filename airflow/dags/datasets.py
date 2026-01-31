@@ -50,6 +50,27 @@ for dataset in Config.DATASETS:
     # Assign the dag object to a variable that complies with Airflow's naming conventions
     globals()[dag_id] = dag
 
+    # --------- upload a single dataset ---------
+    dag_id = f'upload_{dataset}'
+
+    dag = DAG(
+        dag_id,
+        default_args=default_args,
+        description=f'Upload data for {dataset} to S3',
+        schedule=None,
+        catchup=False
+    )
+
+    run_upload_script = BashOperator(
+        task_id=f'run_upload_script_{dataset}',
+        bash_command=get_cli_command(f'upload --dataset {dataset}'),
+        dag=dag,
+        retries=0,
+    )
+
+    # Assign the dag object to a variable that complies with Airflow's naming conventions
+    globals()[dag_id] = dag
+
 # --------- download all datasets ---------
 # Creation of a 'download_all' DAG that triggers all 'download_{dataset}' DAGs
 download_all = DAG(
@@ -94,6 +115,19 @@ for dataset in Config.DATASETS:
         dag=to_zarr_all,
     )
 
-
-# Upload is done manually via the command line, not via Airflow.
-# See workflow_update_data_for_release.sh for instructions.
+# --------- upload all datasets ---------
+# Creation of an 'upload_all' DAG that triggers all 'upload_{dataset}' DAGs
+upload_all = DAG(
+    'upload_all',
+    default_args=default_args,
+    description='Trigger all the upload tasks',
+    schedule=None,
+    catchup=False
+)
+for dataset in Config.DATASETS:
+    trigger = TriggerDagRunOperator(
+        task_id=f'trigger_upload_{dataset}_from_upload_all',
+        trigger_dag_id=f'upload_{dataset}',
+        wait_for_completion=True,
+        dag=upload_all,
+    )

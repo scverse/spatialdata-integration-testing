@@ -57,8 +57,8 @@ class Config:
     # 'pr 329' for pull request 329
     # None for latest release
     REPOSITORIES = {
-        "spatialdata": 'main',
-        "spatialdata-io": 'main',
+        "spatialdata": 'pr 1060',
+        "spatialdata-io": 'pr 360',
         "spatialdata-plot": 'main',
         "napari-spatialdata": 'main',
         "spatialdata-notebooks": 'main',

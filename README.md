@@ -43,18 +43,20 @@ If you have access to remote machine, everything is already setup.
 
     Each stage waits for all jobs from the previous stage to complete before starting. Jobs within each stage run in parallel.
 
-3. **Upload data (right before a release).**
+3. **Upload data (after a release).**
 
-    Upload is done manually via the command line (not via Airflow). Once tests pass and you are ready to release, upload the data right before making the release:
-    ```bash
-    bash src/spatialdata_data_converter/workflow_update_data_for_release.sh <spatialdata-version> <spatialdata-io-version>
-    ```
+    After making the release:
+    1. Set `spatialdata` and `spatialdata-io` to `None` in `src/spatialdata_data_converter/config.py` so they use the latest release.
+    2. Run the full test workflow (`0_orchestrator_test_workflow`). This is necessary because the `to_zarr` step writes the `spatialdata` and `spatialdata-io` versions into the zarr metadata, which is then used to name the uploaded files.
+    3. Trigger the `upload_all` DAG. The version suffix is automatically inferred from the zarr metadata.
+
     After the upload is successful, manually add the new version entry in `dependencies/spatialdata-notebooks/datasets/README.md` so that the download link appears in the docs.
 
 **Notes:**
 - The `update_dev_dataset` DAG will run automatically daily, so there's no need to manually trigger it (it is not triggered by the above).
 - You can also run individual DAGs manually if needed (e.g., `tests_spatialdata`, `to_zarr_xenium_rep1_io`).
 - If some jobs fail, you can manually retrigger the failed jobs using the Airflow UI, by pressing the "Clear" button (⟳).
+- To clean up stuck jobs, stop the scheduler first, then run `pixi run clean-airflow`. This deletes all DAG runs and task instances with state `running` or `queued`.
 
 ## Installation (Airflow)
 
@@ -145,17 +147,12 @@ Follow the prerequisites from the [Installation (Airflow)](#installation-airflow
     bash src/spatialdata_data_converter/invoke_cli.sh
     ```
 
-4. Right before making a release, upload the new datasets to S3 by running:
-    ```bash
-    bash src/spatialdata_data_converter/workflow_update_data_for_release.sh <spatialdata-version> <spatialdata-io-version>
-    ```
+4. After making a release, upload the new datasets to S3:
+    1. Set `spatialdata` and `spatialdata-io` to `None` in `src/spatialdata_data_converter/config.py` so they use the latest release.
+    2. Re-run the test workflow (steps 1–3 above) so that the zarr metadata contains the released versions.
+    3. Upload via `pixi run python -m spatialdata_data_converter upload --dataset <name>` for each dataset. The version suffix is automatically inferred from zarr metadata.
+
     After the upload is successful, manually add the new version entry in `dependencies/spatialdata-notebooks/datasets/README.md` so that the download link appears in the docs.
-## Future improvements
-### Upload process
-- [ ] The `spatialdata-io` version should be added to the `sdata.zarr` metadata.
-- [ ] The upload script should read the `spatialdata` version and `spatialdata-io` version from the metadata.
-- [ ] The upload task should be re-added to the DAG.
-- [ ] There should still be the optoin to run the upload manually before making a release.
 
 ## Some screenshots
 
