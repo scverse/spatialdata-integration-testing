@@ -71,10 +71,7 @@ notebook_docs_all = DAG(
     'notebook_docs_all',
     default_args=default_args,
     description='Trigger all the notebook tasks for docs notebooks (lightweight)',
-    # every day at 12PM
-    schedule='0 12 * * *',
-    # schedule=None,
-    # schedule_interval='@daily',
+    schedule=None,
     catchup=False
 )
 for notebook in docs_notebooks:

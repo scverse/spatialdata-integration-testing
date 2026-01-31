@@ -8,7 +8,7 @@ dag = DAG(
     'update_dev_datasets',
     default_args=default_args,
     description='Regenerate dev datasets',
-    schedule='0 0 * * *',  # Every day at midnight
+    schedule=None,
     catchup=False
 )
 

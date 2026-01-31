@@ -59,7 +59,7 @@ orchestrator_test_workflow = DAG(
     '0_orchestrator_test_workflow',
     default_args=default_args,
     description='Test workflow: update repos, env, run tests, convert to zarr, run notebooks',
-    schedule=None,
+    schedule='0 0 * * *',  # Every day at midnight
     catchup=False
 )
 

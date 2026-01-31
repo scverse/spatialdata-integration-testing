@@ -8,7 +8,7 @@ dag = DAG(
     'config_install_env',
     default_args=default_args,
     description='Install the environment for the project',
-    schedule='0 11 * * MON',
+    schedule=None,
     catchup=False
 )
 

@@ -36,7 +36,7 @@ tests_all = DAG(
     'tests_all',
     default_args=default_args,
     description='Trigger all pytest tasks',
-    schedule='@daily',
+    schedule=None,
     catchup=False
 )
 
