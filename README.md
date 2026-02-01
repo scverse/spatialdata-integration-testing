@@ -1,4 +1,4 @@
-# spatialdata-data-converter
+# spatialdata-integration-testing
 
 Automated pipeline for the end-to-end testing of the SpatialData framework, the conversion of sample datasets and the upload of the converted datasets to S3.
 
