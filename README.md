@@ -41,7 +41,8 @@ If you have access to remote machine, everything is already setup.
     4. `to_zarr_all`
     5. `notebook_docs_all`
 
-    Each stage waits for all jobs from the previous stage to complete before starting. Jobs within each stage run in parallel.
+    - Each stage waits for all jobs from the previous stage to complete before starting. Jobs within each stage run in parallel.
+    - Running the whole test workflow takes around 20 minutes on a MacBook Pro M4 Pro
 
 3. **Upload data (before a release).**
 
