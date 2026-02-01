@@ -8,14 +8,17 @@ R = Path(sdcc.Config.REPOSITORIES_FOLDER)
 
 
 def create_symlink(src, dst):
-    # check if dst does not already exist
     src = str(src)
     dst = str(dst)
     if os.path.lexists(dst):
         print(f"Symlink: {dst} already exists, removing it.")
         os.remove(dst)
-    # create the symbolic link
-    os.symlink(src, dst)
+    try:
+        os.symlink(src, dst)
+    except FileExistsError:
+        # Symlink already exists, likely it was concurrently created
+        print(f"Symlink: {dst} already exists, likely it was concurrently created. Skipping.")
+        return
     print(f"Symlink created at {dst} pointing to {src}.")
 
 
