@@ -1,4 +1,4 @@
-# spatialdata-data-converter
+# spatialdata-integration-testing
 
 Automated pipeline for the end-to-end testing of the SpatialData framework, the conversion of sample datasets and the upload of the converted datasets to S3.
 
@@ -9,6 +9,8 @@ This repository contains a series of scripts that can be orchestrated with Airfl
 **Recommended: Airflow.** 
 - Remote execution. A machine connected to the internet to which the team has secure access runs Airflow 24/7 and provides a continuously up-to-date status on the health of the SpatialData framework. The Airflow pipeline is configured to use a parallel executor.
 - Local execution. Easier when developing and quickly testing locally, for instance before a code release (since our remote machine is currently less powerful than a beefed up Apple Silicon MacBook Pro).
+
+See a [quick overview video](https://www.loom.com/share/20f739416d8c47e59be99d455b232e4e) showing how to use the pipeline before a release of the SpatialData framework.
 
 **Alternative approaches:**
 - Manual execution, sequentially. Run jobs in a series of bash scripts. Simple to understand, to run, to debug.
@@ -41,7 +43,8 @@ If you have access to remote machine, everything is already setup.
     4. `to_zarr_all`
     5. `notebook_docs_all`
 
-    Each stage waits for all jobs from the previous stage to complete before starting. Jobs within each stage run in parallel.
+    - Each stage waits for all jobs from the previous stage to complete before starting. Jobs within each stage run in parallel.
+    - Running the whole test workflow takes around 20 minutes on a MacBook Pro M4 Pro
 
 3. **Upload data (before a release).**
 
