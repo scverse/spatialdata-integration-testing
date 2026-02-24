@@ -58,7 +58,7 @@ class Config:
     # None for latest release
     REPOSITORIES = {
         "spatialdata": 'main',
-        "spatialdata-io": 'main',
+        "spatialdata-io": 'pr 370',
         "spatialdata-plot": 'main',
         "napari-spatialdata": 'main',
         "spatialdata-notebooks": 'main',
