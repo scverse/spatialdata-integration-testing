@@ -190,7 +190,7 @@ def _run_tests(repo, test_path, docker=None):
             )
 
         # Run tests in Docker
-        docker_cmd = "docker run --rm sit-spatialdata-plot python -m pytest"
+        docker_cmd = "docker run --rm sit-spatialdata-plot python -m pytest -n auto --dist worksteal"
         if test_path:
             full_test_path = Path(ssdc.Config.REPOSITORIES_FOLDER) / 'spatialdata-plot' / 'tests' / test_path
             docker_cmd += f" {full_test_path}"
@@ -201,7 +201,7 @@ def _run_tests(repo, test_path, docker=None):
     if test_path:
         path = path / test_path
     run_subprocess(
-        cmd=f"pushd . && cd {repo_path} && python -m pytest -v {str(path)} && popd",
+        cmd=f"pushd . && cd {repo_path} && python -m pytest -v -n auto --dist worksteal {str(path)} && popd",
         env=sdcc.Config.ENV,
         update_repos=False,
     )

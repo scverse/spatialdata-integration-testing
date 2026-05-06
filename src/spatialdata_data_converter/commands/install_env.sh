@@ -69,7 +69,7 @@ conda activate $ENV
 # TODO: ideally we won't need all these packages. They should either be dependencies of spatialdata-data-converter or add as extras when installing the (napari-)spatialdata(-io|-plot) packages
 # fontconfig is a requirement of vispy when running pytest
 mamba install pytorch torchvision torchaudio cpuonly rclone joblib -c pytorch -c conda-forge -y
-mamba install -c conda-forge nbconvert pytest jupyter ipywidgets jupyterlab chardet unzip papermill watermark python-igraph leidenalg rclone pytorch-lightning monai pyqt fontconfig -y
+mamba install -c conda-forge nbconvert pytest pytest-xdist jupyter ipywidgets jupyterlab chardet unzip papermill watermark python-igraph leidenalg rclone pytorch-lightning monai pyqt fontconfig -y
 pip install jupyter-black watermark
 
 echo "-------- installing spatialdata and related libraries --------"
