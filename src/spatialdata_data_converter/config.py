@@ -63,7 +63,7 @@ class Config:
         "napari-spatialdata": 'main',
         "spatialdata-notebooks": 'main',
         "spatialdata-sandbox": 'main',
-        "squidpy": 'pr 1068',
+        "squidpy": 'main',
     }
     S3_BUCKET_PATH = "embl-s3:/spatialdata/spatialdata-sandbox"
     ENV = "ome_sdc"
