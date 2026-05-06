@@ -12,7 +12,12 @@ def create_symlink(src, dst):
     dst = str(dst)
     if os.path.lexists(dst):
         print(f"Symlink: {dst} already exists, removing it.")
-        os.remove(dst)
+        try:
+            os.remove(dst)
+        except FileNotFoundError:
+            # Symlink does not exist, likely it was concurrently deleted
+            print(f"Symlink: {dst} does not exist, likely it was concurrently deleted. Skipping.")
+            return
     try:
         os.symlink(src, dst)
     except FileExistsError:
