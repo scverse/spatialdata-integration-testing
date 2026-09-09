@@ -81,6 +81,13 @@ If you have access to remote machine, everything is already setup.
 
 4. Copy `template_envvars.sh` into `envvars.sh` and update the paths as explained in the comments in that file.
 
+5. Make sure a C/C++ compiler and a headless OpenGL stack are installed
+   (needed by `install_env.sh` to build `mahotas`, a `squidpy` dependency,
+   and to import `vispy`/`napari` during test collection). On Debian/Ubuntu:
+    ```bash
+    sudo apt install -y build-essential libgl1 libglx-mesa0 libegl1 libgles2 libosmesa6
+    ```
+
 ### Airflow setup
 1. Configure the Airflow home directory.
 In your `~/.zshrc` file (or depending on your system `~/.bashrc`, `~/.bash_profile`, ...), add the following lines (remember to change the path):
