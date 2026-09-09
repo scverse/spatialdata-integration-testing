@@ -49,8 +49,14 @@ class Config:
         "visium_hd_4.0.1_io",
         "xenium_2.0.0_io",
         "xenium_rep1_io",
+        # raw data for the create_cells_dataset notebook; it is used as-is by the
+        # notebook, so it is not converted to zarr nor uploaded (see the lists below)
+        "xenium_prime_cervical_3.0.0_io",
     ]
     DATASETS_NO_DOWNLOAD = []
+    # datasets that are downloaded but have no to_zarr.py / are not published on S3
+    DATASETS_NO_TO_ZARR = ["xenium_prime_cervical_3.0.0_io"]
+    DATASETS_NO_UPLOAD = ["xenium_prime_cervical_3.0.0_io"]
     # usage:
     # 'main' for main branch
     # 'branch-name' for a specific branch

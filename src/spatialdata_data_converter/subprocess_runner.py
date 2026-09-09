@@ -109,7 +109,10 @@ def run_notebook(
     # notebook_cmd = f'jupyter nbconvert --to notebook --inplace --ExecutePreprocessor.timeout=-1 --execute {shlex.quote(notebook)}.ipynb '
     # method 3: updates the notebook (either inplace or discarding the output). Uses papermill to execute the notebook and show the results in real-time
 
-    notebook_cmd = f"papermill {shlex.quote(notebook)}.ipynb {shlex.quote(output_file)}.ipynb --log-output && "
+    # -k python3 forces the kernel of the active conda env, ignoring the kernelspec the
+    # notebook was authored with (which often refers to a kernel that exists only on the
+    # author's machine)
+    notebook_cmd = f"papermill {shlex.quote(notebook)}.ipynb {shlex.quote(output_file)}.ipynb -k python3 --log-output && "
     cmd = "pushd . && " + f"cd {notebook_folder} && " + notebook_cmd + "popd "
     run_subprocess(cmd=cmd, env=env, update_repos=update_repos, **kwargs)
 

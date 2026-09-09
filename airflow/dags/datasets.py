@@ -30,46 +30,48 @@ for dataset in Config.DATASETS:
         globals()[dag_id] = dag
 
     # --------- convert a single dataset to zarr ---------
-    dag_id = f'to_zarr_{dataset}'
+    if dataset not in Config.DATASETS_NO_TO_ZARR:
+        dag_id = f'to_zarr_{dataset}'
 
-    dag = DAG(
-        dag_id,
-        default_args=default_args,
-        description=f'Convert data for {dataset} to zarr',
-        schedule=None,
-        catchup=False
-    )
+        dag = DAG(
+            dag_id,
+            default_args=default_args,
+            description=f'Convert data for {dataset} to zarr',
+            schedule=None,
+            catchup=False
+        )
 
-    run_to_zarr_script = BashOperator(
-        task_id=f'run_to_zarr_script_{dataset}',
-        bash_command=get_cli_command(f'to-zarr --dataset {dataset}'),
-        dag=dag,
-        retries=0,
-    )
+        run_to_zarr_script = BashOperator(
+            task_id=f'run_to_zarr_script_{dataset}',
+            bash_command=get_cli_command(f'to-zarr --dataset {dataset}'),
+            dag=dag,
+            retries=0,
+        )
 
-    # Assign the dag object to a variable that complies with Airflow's naming conventions
-    globals()[dag_id] = dag
+        # Assign the dag object to a variable that complies with Airflow's naming conventions
+        globals()[dag_id] = dag
 
     # --------- upload a single dataset ---------
-    dag_id = f'upload_{dataset}'
+    if dataset not in Config.DATASETS_NO_UPLOAD:
+        dag_id = f'upload_{dataset}'
 
-    dag = DAG(
-        dag_id,
-        default_args=default_args,
-        description=f'Upload data for {dataset} to S3',
-        schedule=None,
-        catchup=False
-    )
+        dag = DAG(
+            dag_id,
+            default_args=default_args,
+            description=f'Upload data for {dataset} to S3',
+            schedule=None,
+            catchup=False
+        )
 
-    run_upload_script = BashOperator(
-        task_id=f'run_upload_script_{dataset}',
-        bash_command=get_cli_command(f'upload --dataset {dataset}'),
-        dag=dag,
-        retries=0,
-    )
+        run_upload_script = BashOperator(
+            task_id=f'run_upload_script_{dataset}',
+            bash_command=get_cli_command(f'upload --dataset {dataset}'),
+            dag=dag,
+            retries=0,
+        )
 
-    # Assign the dag object to a variable that complies with Airflow's naming conventions
-    globals()[dag_id] = dag
+        # Assign the dag object to a variable that complies with Airflow's naming conventions
+        globals()[dag_id] = dag
 
 # --------- download all datasets ---------
 # Creation of a 'download_all' DAG that triggers all 'download_{dataset}' DAGs
@@ -107,6 +109,8 @@ to_zarr_all = DAG(
     catchup=False
 )
 for dataset in Config.DATASETS:
+    if dataset in Config.DATASETS_NO_TO_ZARR:
+        continue
     trigger = TriggerDagRunOperator(
         task_id=f'trigger_to_zarr_{dataset}_from_to_zarr_all',
         trigger_dag_id=f'to_zarr_{dataset}',
@@ -124,6 +128,8 @@ upload_all = DAG(
     catchup=False
 )
 for dataset in Config.DATASETS:
+    if dataset in Config.DATASETS_NO_UPLOAD:
+        continue
     trigger = TriggerDagRunOperator(
         task_id=f'trigger_upload_{dataset}_from_upload_all',
         trigger_dag_id=f'upload_{dataset}',

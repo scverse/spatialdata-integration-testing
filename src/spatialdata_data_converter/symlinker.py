@@ -93,6 +93,14 @@ def technology_xenium_make_symlinks():
 def technology_spacem_make_symlinks():
     create_symlink(R / 'spatialdata-sandbox/spacem_helanih3t3/data.zarr', R / 'spatialdata-notebooks/notebooks/examples/spacem_helanih3t3.zarr')
 
+def create_cells_dataset_make_symlinks():
+    # unlike the other notebooks, this one reads the raw (not converted) data, so we
+    # symlink the folder prepared by xenium_prime_cervical_3.0.0_io/download.py
+    create_symlink(
+        R / 'spatialdata-sandbox/xenium_prime_cervical_3.0.0_io/data/Xenium_Prime_Cervical_Cancer_FFPE_outs',
+        R / 'spatialdata-notebooks/notebooks/examples/Xenium_Prime_Cervical_Cancer_FFPE_outs',
+    )
+
 def make_symlinks(dataset: str):
     if dataset in ['transformations', 'transformations_advanced']:
         return transformations_symlinks
@@ -120,10 +128,12 @@ def make_symlinks(dataset: str):
         return technology_xenium_make_symlinks
     elif dataset == 'technology_spacem':
         return technology_spacem_make_symlinks
+    elif dataset == 'create_cells_dataset':
+        return create_cells_dataset_make_symlinks
     else:
         raise ValueError(f"No symlinker available for dataset = {dataset}")
 
 
 def make_all_symlinks():
-    for dataset in ['transformations', 'densenet', 'transformations_advanced', 'alignment_using_landmarks', "spatial_query", "napari_rois", "squidpy_integration", "technology_merfish", "technology_mibitof", "technology_visium", 'technology_visium_hd', 'technology_visium_hd_mouse_4.0.1', 'technology_xenium', 'technology_spacem']:
+    for dataset in ['transformations', 'densenet', 'transformations_advanced', 'alignment_using_landmarks', "spatial_query", "napari_rois", "squidpy_integration", "technology_merfish", "technology_mibitof", "technology_visium", 'technology_visium_hd', 'technology_visium_hd_mouse_4.0.1', 'technology_xenium', 'technology_spacem', 'create_cells_dataset']:
         make_symlinks(dataset)()
