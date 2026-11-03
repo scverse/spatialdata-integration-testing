@@ -83,6 +83,11 @@ class Config:
     CONDA_SH = os.path.expanduser(_env.get("CONDA_SH"))
 
 
+def branch_envvar(repo: str) -> str:
+    """Env var that overrides Config.REPOSITORIES[repo] for `update-repos` (set by the Airflow DAG params)."""
+    return "SDC_BRANCH_" + repo.upper().replace("-", "_")
+
+
 def full_path_of_sandbox_file(file: str) -> str:
     return os.path.join(Config.REPOSITORIES_FOLDER, "spatialdata-sandbox", file)
 

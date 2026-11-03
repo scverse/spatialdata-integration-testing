@@ -29,13 +29,13 @@ def install_env():
     )
 
 @cli.command()
-@click.option("--spatialdata", default="<unchanged>", help="Branch for spatialdata (default: <unchanged>)")
-@click.option("--spatialdata-io", default="<unchanged>", help="Branch for spatialdata-io (default: <unchanged>)")
-@click.option("--spatialdata-plot", default="<unchanged>", help="Branch for spatialdata-plot (default: <unchanged>)")
-@click.option("--napari-spatialdata", default="<unchanged>", help="Branch for napari-spatialdata (default: <unchanged>)")
-@click.option("--spatialdata-notebooks", default="<unchanged>", help="Branch for spatialdata-notebooks (default: <unchanged>)")
-@click.option("--spatialdata-sandbox", default="<unchanged>", help="Branch for spatialdata-sandbox (default: <unchanged>)")
-@click.option("--squidpy", default="<unchanged>", help="Branch for squidpy (default: <unchanged>)")
+@click.option("--spatialdata", default="<unchanged>", envvar=sdcc.branch_envvar("spatialdata"), help="Branch for spatialdata (default: <unchanged>)")
+@click.option("--spatialdata-io", default="<unchanged>", envvar=sdcc.branch_envvar("spatialdata-io"), help="Branch for spatialdata-io (default: <unchanged>)")
+@click.option("--spatialdata-plot", default="<unchanged>", envvar=sdcc.branch_envvar("spatialdata-plot"), help="Branch for spatialdata-plot (default: <unchanged>)")
+@click.option("--napari-spatialdata", default="<unchanged>", envvar=sdcc.branch_envvar("napari-spatialdata"), help="Branch for napari-spatialdata (default: <unchanged>)")
+@click.option("--spatialdata-notebooks", default="<unchanged>", envvar=sdcc.branch_envvar("spatialdata-notebooks"), help="Branch for spatialdata-notebooks (default: <unchanged>)")
+@click.option("--spatialdata-sandbox", default="<unchanged>", envvar=sdcc.branch_envvar("spatialdata-sandbox"), help="Branch for spatialdata-sandbox (default: <unchanged>)")
+@click.option("--squidpy", default="<unchanged>", envvar=sdcc.branch_envvar("squidpy"), help="Branch for squidpy (default: <unchanged>)")
 def update_repos(
     spatialdata,
     spatialdata_io,
