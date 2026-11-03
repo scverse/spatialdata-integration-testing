@@ -38,6 +38,7 @@ pyproj = ">=3.7.1,<4"
 click = ">=8.2.2,<9"
 apache-airflow = ">=3.1.5,<4"
 zarr = ">=3.1.5,<4"
+apache-airflow-providers-fab = ">=3.8.0,<4"
 
 [tool.pixi.tasks]
 scheduler = "airflow standalone"
