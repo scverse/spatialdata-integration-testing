@@ -1,5 +1,7 @@
+import sys
 import click
 from spatialdata_data_converter.subprocess_runner import (
+    SubprocessFailed,
     run_subprocess,
     run_script,
     run_notebook,
@@ -204,7 +206,7 @@ def _run_tests(repo, test_path, docker=None):
     if test_path:
         path = path / test_path
     run_subprocess(
-        cmd=f"pushd . && cd {repo_path} && python -m pytest -v -n {sdcc.Config.PYTEST_WORKERS} --dist worksteal {str(path)} && popd",
+        cmd=f"pushd . && cd {repo_path} && python -m pytest -q --tb=short -rfE --disable-warnings -n {sdcc.Config.PYTEST_WORKERS} --dist worksteal {str(path)} && popd",
         env=sdcc.Config.ENV,
         update_repos=False,
     )
@@ -324,5 +326,19 @@ def clean_airflow():
     click.echo(f"\nDeleted {n_runs} DAG runs and {n_tasks} task instances.")
 
 
+def main():
+    # A failing command has already printed its FAILED/KILLED banner; exit with its
+    # code instead of adding a Python traceback of this wrapper below it.
+    try:
+        cli(standalone_mode=False)
+    except SubprocessFailed as e:
+        sys.exit(e.returncode if 0 < e.returncode < 256 else 1)
+    except click.exceptions.ClickException as e:
+        e.show()
+        sys.exit(e.exit_code)
+    except click.exceptions.Abort:
+        sys.exit(1)
+
+
 if __name__ == "__main__":
-    cli()
+    main()

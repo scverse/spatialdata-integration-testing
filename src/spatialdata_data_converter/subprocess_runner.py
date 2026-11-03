@@ -1,4 +1,7 @@
+import signal
 import subprocess
+import sys
+import time
 from spatialdata_data_converter.utils import update_all_repos
 import spatialdata_data_converter.config as sdcc
 import shlex
@@ -21,6 +24,67 @@ def get_env_var(**kwargs) -> str:
     return env_var
 
 
+# Airflow's log viewer folds everything between these two markers into a
+# collapsible section, so the bulk output is hidden by default and the failure
+# banner printed after it is what you see first.
+GROUP_START = "::group::"
+GROUP_END = "::endgroup::"
+
+SIGNAL_HINTS = {
+    signal.SIGTERM: (
+        "Airflow stops tasks with SIGTERM when they hit their execution_timeout, when "
+        "someone marks the run/task as failed or success or clears it, or when the "
+        "worker shuts down. It was not an error inside the command itself."
+    ),
+    signal.SIGKILL: "Killed with SIGKILL, typically by the kernel's out-of-memory killer (check `dmesg`).",
+}
+
+
+class SubprocessFailed(Exception):
+    """A command run via run_subprocess exited non-zero (the banner has already been printed)."""
+
+    def __init__(self, returncode: int, cmd: str):
+        self.returncode = returncode
+        self.cmd = cmd
+        super().__init__(f"command failed with return code {returncode}: {cmd}")
+
+
+def _failure_excerpt(lines: list[str], max_lines: int = 80) -> list[str]:
+    """The part of the output that explains the failure, best guess."""
+    # pytest: everything from its final summary on
+    for i in range(len(lines) - 1, -1, -1):
+        if "short test summary info" in lines[i]:
+            return lines[i:][-max_lines:]
+    # papermill / python: the last traceback
+    for marker in ("Exception encountered at", "Traceback (most recent call last)"):
+        for i in range(len(lines) - 1, -1, -1):
+            if marker in lines[i]:
+                return lines[i:][-max_lines:]
+    return lines[-30:]
+
+
+def _print_banner(title: str, body: list[str]) -> None:
+    bar = "=" * 30
+    print()
+    print(f"{bar} {title} {bar}")
+    for line in body:
+        print(line.rstrip("\n"))
+    print("=" * (len(title) + 2 * len(bar) + 2), flush=True)
+
+
+def _describe_returncode(returncode: int) -> tuple[str, list[str]]:
+    # negative: the child was killed by a signal (Popen convention);
+    # 128+N: bash reporting that its child was killed by signal N
+    signum = -returncode if returncode < 0 else returncode - 128 if returncode > 128 else None
+    if signum:
+        try:
+            name = signal.Signals(signum).name
+        except ValueError:
+            name = f"signal {signum}"
+        return f"KILLED ({name})", [SIGNAL_HINTS.get(signum, "")]
+    return f"FAILED (exit code {returncode})", []
+
+
 def run_subprocess(cmd: str, env: str | None, update_repos: bool = True, **kwargs) -> str:
     """Run `cmd` in bash, inside the conda env `env`; `env=None` runs it without activating one."""
     if update_repos:
@@ -35,22 +99,10 @@ def run_subprocess(cmd: str, env: str | None, update_repos: bool = True, **kwarg
             f"conda activate {env} && {env_var}"
         )
     full_cmd = f'bash -c "{cmd_env}{cmd}"'
+
+    # prints the stdout as it is produced, folded into a log group
+    print(f"{GROUP_START}Output of: {cmd[:120]}", flush=True)
     print(full_cmd)
-
-    # prints the stdout at the end of the process
-    #     process = subprocess.run(
-    #         cmd,
-    #         shell=True,
-    #         text=True,
-    #         capture_output=True,
-    #     )
-    #     print(process.stdout)
-    #     print(process.stderr)
-    #     if process.returncode != 0:
-    #         raise Exception(f'Python subprocess {cmd} failed to run with return code {process.returncode}')
-    #     return process.stdout
-
-    # prints the stdout as it is produced
     process = subprocess.Popen(
         full_cmd,
         shell=True,
@@ -61,22 +113,41 @@ def run_subprocess(cmd: str, env: str | None, update_repos: bool = True, **kwarg
         universal_newlines=True,
     )
 
+    # If Airflow terminates the task, it signals the whole process group. Make sure
+    # we still say so (and why) at the end of the log instead of vanishing silently.
+    started = time.monotonic()
     output = []
+
+    def _on_term(signum, frame):
+        process.terminate()
+        minutes = (time.monotonic() - started) / 60
+        print(GROUP_END)
+        title, hints = _describe_returncode(-signum)
+        _print_banner(title, [f"after {minutes:.1f} min while running: {cmd[:200]}", *hints, "", "Last output:", *output[-15:]])
+        sys.exit(128 + signum)
+
+    try:
+        previous = signal.signal(signal.SIGTERM, _on_term)
+    except ValueError:  # not in the main thread; keep the default behaviour
+        previous = None
     try:
         for line in process.stdout:
             print(line, end="")  # Print each line as it is produced
             output.append(line)
-    except Exception as e:
+    except Exception:
         process.kill()
-        raise e
+        raise
     finally:
         process.stdout.close()
         process.wait()
+        if previous is not None:
+            signal.signal(signal.SIGTERM, previous)
 
+    print(GROUP_END, flush=True)
     if process.returncode != 0:
-        raise Exception(
-            f"Python subprocess {full_cmd} failed to run with return code {process.returncode}"
-        )
+        title, hints = _describe_returncode(process.returncode)
+        _print_banner(title, [f"command: {cmd[:200]}", *[h for h in hints if h], "", *_failure_excerpt(output)])
+        raise SubprocessFailed(process.returncode, full_cmd)
     return "".join(output)
 
 
