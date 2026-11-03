@@ -1,6 +1,7 @@
 from airflow import DAG
 from airflow.providers.standard.operators.bash import BashOperator
-from spatialdata_data_converter.config import get_airflow_default_args, get_cli_command
+from airflow.sdk import Param
+from spatialdata_data_converter.config import Config, branch_envvar, get_airflow_default_args, get_cli_command
 
 default_args = get_airflow_default_args()
 
@@ -20,17 +21,32 @@ run_shell_script = BashOperator(
 )
 
 # --------- update repos DAG ---------
+# Per-run branch overrides ("Trigger DAG w/ config"); empty = use Config.REPOSITORIES.
+# Same syntax as Config.REPOSITORIES: 'main', 'branch-name', 'pr 329', 'tag v0.4.0', 'None' (latest release).
+REPOSITORY_PARAMS = {
+    repo: Param(
+        None,
+        type=["null", "string"],  # nullable, so the trigger form doesn't mark it required
+        description=f"Branch / 'pr <n>' / 'tag <t>' / 'None' for {repo}; empty = config.py ({Config.REPOSITORIES[repo]!r})",
+    )
+    for repo in Config.REPOSITORIES
+}
+
 dag_update_repos = DAG(
     'config_update_repos',
     default_args=default_args,
     description='Update all repositories to configured branches',
     schedule=None,
-    catchup=False
+    catchup=False,
+    params=REPOSITORY_PARAMS,
 )
 
 update_repos_task = BashOperator(
     task_id='update_repos',
     bash_command=get_cli_command('update-repos'),
+    # passed via env vars (read by the click options) rather than CLI args, to avoid shell quoting
+    env={branch_envvar(repo): "{{ params['%s'] or '' }}" % repo for repo in REPOSITORY_PARAMS},
+    append_env=True,
     dag=dag_update_repos,
     retries=0,
 )

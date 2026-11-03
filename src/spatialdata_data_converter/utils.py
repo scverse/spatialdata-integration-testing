@@ -16,7 +16,9 @@ def update_repo(repo_name: str, branch: str):
         if branch is not None:
             if "pr " in branch:
                 pr_number = branch.split(" ")[-1]
-                subprocess.check_output(['gh', 'pr', 'checkout', pr_number], stderr=subprocess.STDOUT)
+                # plain git rather than `gh pr checkout`, so no GitHub login is needed
+                subprocess.check_output(['git', 'fetch', 'origin', f'pull/{pr_number}/head'], stderr=subprocess.STDOUT)
+                subprocess.check_output(['git', 'checkout', '--detach', 'FETCH_HEAD'], stderr=subprocess.STDOUT)
             elif "tag " in branch:
                 tag_name = branch.split(" ")[-1]
                 subprocess.check_output(['git', 'checkout', tag_name], stderr=subprocess.STDOUT)
