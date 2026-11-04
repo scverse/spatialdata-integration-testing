@@ -6,3 +6,8 @@ export BASHRC="~/.zshrc"
 
 # you can find this path by looking at the content added by conda init into your BASHRC file
 export CONDA_SH="/opt/miniconda3/etc/profile.d/conda.sh"
+
+# optional: where the tested repositories (and all downloaded/converted data inside them) live.
+# Default: the dependencies/ submodules of this checkout. Set it to keep that state outside the
+# checkout; missing repositories are then cloned there by `update-repos`.
+# export SDC_WORKSPACE="/path/to/workspace"

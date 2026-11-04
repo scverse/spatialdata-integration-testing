@@ -80,6 +80,7 @@ If you have access to remote machine, everything is already setup.
     ```
 
 4. Copy `template_envvars.sh` into `envvars.sh` and update the paths as explained in the comments in that file.
+    Optionally set `SDC_WORKSPACE` there to keep the tested repositories, and all data downloaded/converted inside them, outside this checkout (default: the `dependencies/` submodules). Missing repositories are cloned into it by `update-repos`. On a shared server this keeps the checkout itself read-only for whoever runs the tasks. Note that the commits the submodules are pinned to are then not used; `update-repos` checks out the branch/PR/tag configured in `Config.REPOSITORIES` anyway.
 
 5. Make sure a C/C++ compiler and a headless OpenGL stack are installed
    (needed by `install_env.sh` to build `mahotas`, a `squidpy` dependency,
