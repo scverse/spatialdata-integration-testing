@@ -13,7 +13,7 @@ config_file_path = Path(__file__).parent
 def read_envvars_from_sh(envvars_path):
     """Reads environment variables from a shell script by sourcing it."""
     # Use 'set -a' to export all variables, then source the file, then printenv
-    command = f"set -a && source \"{envvars_path}\" && python3 -c \"import os, json; print(json.dumps({{k: os.environ[k] for k in ['BASHRC', 'CONDA_SH', 'SDC_WORKSPACE'] if k in os.environ}}))\""
+    command = f"set -a && source \"{envvars_path}\" && python3 -c \"import os, json; print(json.dumps({{k: os.environ[k] for k in ['BASHRC', 'CONDA_SH', 'SDC_WORKSPACE', 'SDC_PYTEST_WORKERS'] if k in os.environ}}))\""
     result = subprocess.run(
         ["bash", "-c", command], capture_output=True, text=True, check=True
     )
@@ -36,17 +36,31 @@ def _workspace_folder(root_folder: Path, env: dict) -> Path:
     return path if path.is_absolute() else root_folder / path
 
 
+def _pytest_workers(env: dict) -> str:
+    """Value for pytest-xdist's `-n` in `run-tests`.
+
+    Defaults to `auto` (one worker per CPU). Set SDC_PYTEST_WORKERS (environment or envvars.sh) to a
+    number to bound memory: each worker imports the full stack, so `auto` on a 16-core server runs
+    16 of them per test suite.
+    """
+    value = (os.environ.get("SDC_PYTEST_WORKERS") or env.get("SDC_PYTEST_WORKERS") or "auto").strip()
+    if not (value.isdigit() or value in ("auto", "logical")):
+        raise ValueError(f"SDC_PYTEST_WORKERS must be a number, 'auto' or 'logical', got {value!r}")
+    return value
+
+
 class Config:
     ROOT_FOLDER = config_file_path.parent.parent
     AIRFLOW_FOLDER = ROOT_FOLDER / "airflow"
     DAGS_PATH = AIRFLOW_FOLDER / "dags"
-    # Read BASHRC, CONDA_SH and (optionally) SDC_WORKSPACE from envvars.sh; this file should be
-    # manually created (see template_envvars.sh in the repository root)
+    # Read BASHRC, CONDA_SH and (optionally) SDC_WORKSPACE / SDC_PYTEST_WORKERS from envvars.sh;
+    # this file should be manually created (see template_envvars.sh in the repository root)
     envvars_path = ROOT_FOLDER / "envvars.sh"
     _env = read_envvars_from_sh(envvars_path)
     BASHRC = os.path.expanduser(_env.get("BASHRC"))
     CONDA_SH = os.path.expanduser(_env.get("CONDA_SH"))
     REPOSITORIES_FOLDER = _workspace_folder(ROOT_FOLDER, _env)
+    PYTEST_WORKERS = _pytest_workers(_env)
     COMMANDS_FOLDER = config_file_path / "commands"
     DOCS_NOTEBOOKS_FOLDER = os.path.join(
         REPOSITORIES_FOLDER, "spatialdata-notebooks/notebooks/examples"
