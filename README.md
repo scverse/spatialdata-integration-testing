@@ -101,6 +101,8 @@ pixi run airflow standalone
 ```
 When running the command above for the first time, it creates a configuration file in `$AIRFLOW_HOME/airflow.cfg`. After creating the configuration, the command starts the webserver and the scheduler.
 
+Airflow tasks run their commands with `pixi run --as-is`, i.e. in the environment as it is installed, without updating or reinstalling it. After pulling a change to `pixi.lock`, run `pixi install` (or restart Airflow via `pixi run airflow ...`, which does the same) so tasks pick it up.
+
 3. Manually change the configuration.
 Set
 ```python
