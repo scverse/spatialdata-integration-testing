@@ -57,7 +57,10 @@ echo "-------- remove old env --------"
 if [[ "$CONDA_DEFAULT_ENV" == "$ENV" ]]; then
     conda deactivate
 fi
-conda remove -n $ENV --all -y
+# only if it exists: on a fresh setup there is no env yet, and `remove` would fail (set -e)
+if conda env list | awk '{print $1}' | grep -qx "$ENV"; then
+    conda remove -n $ENV --all -y
+fi
 
 echo "-------- create new env --------"
 mamba create -n $ENV -c conda-forge python==3.13 -y
