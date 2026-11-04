@@ -111,7 +111,11 @@ def get_airflow_default_args():
 def get_cli_command(cli_args: str) -> str:
     """Build CLI command using pixi."""
     # PYTHONUNBUFFERED=1 ensures real-time log output in Airflow UI
-    return f'cd {Config.ROOT_FOLDER} && PYTHONUNBUFFERED=1 pixi run python -m spatialdata_data_converter {cli_args}'
+    # --as-is: use the already-installed environment without checking/updating pixi.lock or
+    # (re)installing. Tasks then never write to .pixi/, so they can run as a user that has only
+    # read access to it (e.g. Airflow's run_as_user / default_impersonation). The environment is
+    # installed by whoever starts Airflow (`pixi run airflow ...` or `pixi install`).
+    return f'cd {Config.ROOT_FOLDER} && PYTHONUNBUFFERED=1 pixi run --as-is python -m spatialdata_data_converter {cli_args}'
 
 
 if __name__ == "__main__":
