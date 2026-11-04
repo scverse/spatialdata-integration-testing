@@ -3,8 +3,23 @@ import subprocess
 import spatialdata_data_converter.config as sdcc
 
 
+def _submodule_url(repo_name: str) -> str:
+    """URL of dependencies/<repo_name> as recorded in this repository's .gitmodules."""
+    return subprocess.check_output(
+        ['git', 'config', '-f', str(sdcc.Config.ROOT_FOLDER / '.gitmodules'),
+         f'submodule.dependencies/{repo_name}.url'],
+        text=True,
+    ).strip()
+
+
 def update_repo(repo_name: str, branch: str):
     f = os.path.join(sdcc.Config.REPOSITORIES_FOLDER, repo_name)
+    if not os.path.exists(f):
+        # e.g. a fresh SDC_WORKSPACE outside the checkout: clone instead of using the submodule
+        os.makedirs(sdcc.Config.REPOSITORIES_FOLDER, exist_ok=True)
+        url = _submodule_url(repo_name)
+        print('cloning:', repo_name, 'from', url)
+        subprocess.check_output(['git', 'clone', url, f], stderr=subprocess.STDOUT)
     os.chdir(f)
     print('updating:', repo_name)
     #if branch is not None:

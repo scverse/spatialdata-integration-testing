@@ -13,7 +13,7 @@ config_file_path = Path(__file__).parent
 def read_envvars_from_sh(envvars_path):
     """Reads environment variables from a shell script by sourcing it."""
     # Use 'set -a' to export all variables, then source the file, then printenv
-    command = f"set -a && source \"{envvars_path}\" && python3 -c \"import os, json; print(json.dumps({{k: os.environ[k] for k in ['BASHRC', 'CONDA_SH'] if k in os.environ}}))\""
+    command = f"set -a && source \"{envvars_path}\" && python3 -c \"import os, json; print(json.dumps({{k: os.environ[k] for k in ['BASHRC', 'CONDA_SH', 'SDC_WORKSPACE'] if k in os.environ}}))\""
     result = subprocess.run(
         ["bash", "-c", command], capture_output=True, text=True, check=True
     )
@@ -22,11 +22,31 @@ def read_envvars_from_sh(envvars_path):
     return json.loads(result.stdout)
 
 
+def _workspace_folder(root_folder: Path, env: dict) -> Path:
+    """Folder holding the checked-out repositories (and, inside them, all data).
+
+    Defaults to the `dependencies/` submodules of this repository. Set SDC_WORKSPACE (environment or
+    envvars.sh) to keep that mutable state outside the checkout, e.g. on a server where the checkout
+    is read-only for the user running the tasks. Repositories missing there are cloned by `update-repos`.
+    """
+    value = os.environ.get("SDC_WORKSPACE") or env.get("SDC_WORKSPACE")
+    if not value:
+        return root_folder / "dependencies"
+    path = Path(os.path.expanduser(value))
+    return path if path.is_absolute() else root_folder / path
+
+
 class Config:
     ROOT_FOLDER = config_file_path.parent.parent
     AIRFLOW_FOLDER = ROOT_FOLDER / "airflow"
     DAGS_PATH = AIRFLOW_FOLDER / "dags"
-    REPOSITORIES_FOLDER = ROOT_FOLDER / "dependencies"
+    # Read BASHRC, CONDA_SH and (optionally) SDC_WORKSPACE from envvars.sh; this file should be
+    # manually created (see template_envvars.sh in the repository root)
+    envvars_path = ROOT_FOLDER / "envvars.sh"
+    _env = read_envvars_from_sh(envvars_path)
+    BASHRC = os.path.expanduser(_env.get("BASHRC"))
+    CONDA_SH = os.path.expanduser(_env.get("CONDA_SH"))
+    REPOSITORIES_FOLDER = _workspace_folder(ROOT_FOLDER, _env)
     COMMANDS_FOLDER = config_file_path / "commands"
     DOCS_NOTEBOOKS_FOLDER = os.path.join(
         REPOSITORIES_FOLDER, "spatialdata-notebooks/notebooks/examples"
@@ -74,13 +94,6 @@ class Config:
     S3_BUCKET_PATH = "embl-s3:/spatialdata/spatialdata-sandbox"
     ENV = "ome_sdc"
     EMAILS = []
-
-    # Read BASHRC and CONDA_SH from envvars.sh; this file should be manually created
-    # (see template_envvars.sh in the repository root)
-    envvars_path = ROOT_FOLDER / "envvars.sh"
-    _env = read_envvars_from_sh(envvars_path)
-    BASHRC = os.path.expanduser(_env.get("BASHRC"))
-    CONDA_SH = os.path.expanduser(_env.get("CONDA_SH"))
 
 
 def branch_envvar(repo: str) -> str:

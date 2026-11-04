@@ -85,10 +85,15 @@ echo "Path of the spatialdata-data-converter package: $PACKAGE_PATH"
 
 # # 4. Use the absolute path in pip install commands
 # install spatialdata first so other packages use local version instead of PyPI
-pip install -e "$PACKAGE_PATH/dependencies/spatialdata[test,docs]"
-pip install -e "$PACKAGE_PATH/dependencies/spatialdata-io[test,doc]"
-pip install -e "$PACKAGE_PATH/dependencies/spatialdata-plot[test]"
-pip install -e "$PACKAGE_PATH/dependencies/napari-spatialdata[test]"
-pip install -e "$PACKAGE_PATH/dependencies/squidpy[test]"
+# same default as Config.REPOSITORIES_FOLDER in config.py (SDC_WORKSPACE may come from envvars.sh)
+WORKSPACE="${SDC_WORKSPACE:-$PACKAGE_PATH/dependencies}"
+WORKSPACE="${WORKSPACE/#\~/$HOME}"
+[[ "$WORKSPACE" = /* ]] || WORKSPACE="$PACKAGE_PATH/$WORKSPACE"
+echo "Repositories (workspace): $WORKSPACE"
+pip install -e "$WORKSPACE/spatialdata[test,docs]"
+pip install -e "$WORKSPACE/spatialdata-io[test,doc]"
+pip install -e "$WORKSPACE/spatialdata-plot[test]"
+pip install -e "$WORKSPACE/napari-spatialdata[test]"
+pip install -e "$WORKSPACE/squidpy[test]"
 # pip install squidpy
 echo "success!"
