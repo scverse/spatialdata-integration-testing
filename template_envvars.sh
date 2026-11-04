@@ -11,3 +11,7 @@ export CONDA_SH="/opt/miniconda3/etc/profile.d/conda.sh"
 # Default: the dependencies/ submodules of this checkout. Set it to keep that state outside the
 # checkout; missing repositories are then cloned there by `update-repos`.
 # export SDC_WORKSPACE="/path/to/workspace"
+
+# optional: number of pytest-xdist workers per test suite in `run-tests` (default: auto = one per CPU).
+# Each worker imports the full stack, so on a many-core machine `auto` can need a lot of memory.
+# export SDC_PYTEST_WORKERS=4
