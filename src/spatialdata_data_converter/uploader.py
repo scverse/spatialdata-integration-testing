@@ -100,7 +100,8 @@ def upload_to_s3(
         zip_path.unlink(missing_ok=True)
 
 def get_data_versions_suffix(sdata_path: Path) -> str:
-    store = LocalStore(str(sdata_path))
+    # read-only: the uploader must never modify the dataset (and may lack write access to it)
+    store = LocalStore(str(sdata_path), read_only=True)
     group = zarr.open(store=store, mode='r')
     spatialdata_attrs = group.attrs.get("spatialdata_attrs")
     if spatialdata_attrs is None:
