@@ -23,7 +23,10 @@ def install_env():
     path = sdcc.Config.COMMANDS_FOLDER / "install_env.sh"
     run_subprocess(
         cmd=f"bash {path}",
-        env="base",
+        # install_env.sh sources CONDA_SH and activates/creates envs itself. Activating "base"
+        # here first only deactivated the caller's env (e.g. pixi's, which provides micromamba),
+        # so the script could no longer find micromamba.
+        env=None,
         update_repos=False,
         # env_vars={"BASHRC": sdcc.Config.BASHRC, "CONDA_SH": sdcc.Config.CONDA_SH},
     )
