@@ -21,15 +21,19 @@ def get_env_var(**kwargs) -> str:
     return env_var
 
 
-def run_subprocess(cmd: str, env: str, update_repos: bool = True, **kwargs) -> str:
+def run_subprocess(cmd: str, env: str | None, update_repos: bool = True, **kwargs) -> str:
+    """Run `cmd` in bash, inside the conda env `env`; `env=None` runs it without activating one."""
     if update_repos:
         update_all_repos()
     env_var = get_env_var(**kwargs)
-    cmd_env = (
-        # f'source {sdcc.Config.BASHRC} && '
-        f"source {sdcc.Config.CONDA_SH} && "
-        f"conda activate {env} && {env_var}"
-    )
+    if env is None:
+        cmd_env = env_var
+    else:
+        cmd_env = (
+            # f'source {sdcc.Config.BASHRC} && '
+            f"source {sdcc.Config.CONDA_SH} && "
+            f"conda activate {env} && {env_var}"
+        )
     full_cmd = f'bash -c "{cmd_env}{cmd}"'
     print(full_cmd)
 
