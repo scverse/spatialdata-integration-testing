@@ -5,7 +5,9 @@ import os
 
 from datetime import datetime
 from pathlib import Path
+import getpass
 import subprocess
+import tempfile
 
 config_file_path = Path(__file__).parent
 
@@ -13,7 +15,7 @@ config_file_path = Path(__file__).parent
 def read_envvars_from_sh(envvars_path):
     """Reads environment variables from a shell script by sourcing it."""
     # Use 'set -a' to export all variables, then source the file, then printenv
-    command = f"set -a && source \"{envvars_path}\" && python3 -c \"import os, json; print(json.dumps({{k: os.environ[k] for k in ['BASHRC', 'CONDA_SH', 'SDC_WORKSPACE', 'SDC_PYTEST_WORKERS'] if k in os.environ}}))\""
+    command = f"set -a && source \"{envvars_path}\" && python3 -c \"import os, json; print(json.dumps({{k: os.environ[k] for k in ['BASHRC', 'CONDA_SH', 'SDC_WORKSPACE', 'SDC_PYTEST_WORKERS', 'SDC_UPLOAD_STAGING'] if k in os.environ}}))\""
     result = subprocess.run(
         ["bash", "-c", command], capture_output=True, text=True, check=True
     )
@@ -49,11 +51,26 @@ def _pytest_workers(env: dict) -> str:
     return value
 
 
+def _upload_staging_folder(env: dict) -> Path:
+    """Where `upload` builds the dataset zips before sending them to S3.
+
+    Defaults to a per-user folder in the system temp dir. Set SDC_UPLOAD_STAGING (environment or
+    envvars.sh) to put it elsewhere, e.g. on a disk with room for the largest dataset zip. The
+    zip is written here instead of next to the dataset, so the upload works with read-only access
+    to the workspace; it is deleted after each upload.
+    """
+    value = os.environ.get("SDC_UPLOAD_STAGING") or env.get("SDC_UPLOAD_STAGING")
+    if not value:
+        return Path(tempfile.gettempdir()) / f"sdc-upload-staging-{getpass.getuser()}"
+    return Path(os.path.expanduser(value)).absolute()
+
+
 class Config:
     ROOT_FOLDER = config_file_path.parent.parent
     AIRFLOW_FOLDER = ROOT_FOLDER / "airflow"
     DAGS_PATH = AIRFLOW_FOLDER / "dags"
-    # Read BASHRC, CONDA_SH and (optionally) SDC_WORKSPACE / SDC_PYTEST_WORKERS from envvars.sh;
+    # Read BASHRC, CONDA_SH and (optionally) SDC_WORKSPACE / SDC_PYTEST_WORKERS /
+    # SDC_UPLOAD_STAGING from envvars.sh;
     # this file should be manually created (see template_envvars.sh in the repository root)
     envvars_path = ROOT_FOLDER / "envvars.sh"
     _env = read_envvars_from_sh(envvars_path)
@@ -61,6 +78,7 @@ class Config:
     CONDA_SH = os.path.expanduser(_env.get("CONDA_SH"))
     REPOSITORIES_FOLDER = _workspace_folder(ROOT_FOLDER, _env)
     PYTEST_WORKERS = _pytest_workers(_env)
+    UPLOAD_STAGING_FOLDER = _upload_staging_folder(_env)
     COMMANDS_FOLDER = config_file_path / "commands"
     DOCS_NOTEBOOKS_FOLDER = os.path.join(
         REPOSITORIES_FOLDER, "spatialdata-notebooks/notebooks/examples"

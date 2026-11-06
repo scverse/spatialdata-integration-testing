@@ -15,3 +15,7 @@ export CONDA_SH="/opt/miniconda3/etc/profile.d/conda.sh"
 # optional: number of pytest-xdist workers per test suite in `run-tests` (default: auto = one per CPU).
 # Each worker imports the full stack, so on a many-core machine `auto` can need a lot of memory.
 # export SDC_PYTEST_WORKERS=4
+
+# optional: folder where `upload` builds the dataset zips before sending them to S3 (deleted after
+# each upload; needs room for the largest dataset zip). Default: a per-user folder in the system temp dir.
+# export SDC_UPLOAD_STAGING="/path/to/upload-staging"
