@@ -101,7 +101,7 @@ PACKAGES=(
     -e "$WORKSPACE/squidpy" --group "$WORKSPACE/squidpy/pyproject.toml:test"
     -e "$WORKSPACE/napari-spatialdata[test]"  # still a setup.cfg extra, not a dependency group
 )
-# one call, so all repos resolve against the local spatialdata
+# one call: a conflict with the local spatialdata fails instead of silently pulling it from PyPI
 set -o pipefail
 { pip install "${PACKAGES[@]}" 2>&1 1>&3 | awk '{print > "/dev/stderr"} /does not provide the extra/ {bad=1} END {exit bad}'; } 3>&1  # fail if pip warns about a missing extra (stderr only)
 echo "success!"
