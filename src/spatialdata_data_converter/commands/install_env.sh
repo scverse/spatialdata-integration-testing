@@ -99,7 +99,7 @@ PACKAGES=(
     -e "$WORKSPACE/spatialdata-io" --group "$WORKSPACE/spatialdata-io/pyproject.toml:test"
     -e "$WORKSPACE/spatialdata-plot" --group "$WORKSPACE/spatialdata-plot/pyproject.toml:test"
     -e "$WORKSPACE/squidpy" --group "$WORKSPACE/squidpy/pyproject.toml:test"
-    -e "$WORKSPACE/napari-spatialdata[test]"  # a setup.cfg extra, not a dependency group
+    -e "$WORKSPACE/napari-spatialdata[test]"  # still a setup.cfg extra, not a dependency group
 )
 # one call, so all repos resolve against the local spatialdata
 set -o pipefail
