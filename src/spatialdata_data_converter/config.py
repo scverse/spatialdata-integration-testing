@@ -123,7 +123,14 @@ class Config:
         "spatialdata-sandbox": 'main',
         "squidpy": 'main',
     }
-    S3_BUCKET_PATH = "embl-s3:/spatialdata/spatialdata-sandbox"
+    # `upload` publishes s3://<S3_BUCKET>/<S3_PREFIX>/<dataset><suffix>.zip (+ .zip.checksum, sha256),
+    # served at S3_PUBLIC_URL. Same layout as the former EMBL location
+    # (https://s3.embl.de/spatialdata/spatialdata-sandbox/). Credentials: boto3's standard chain
+    # (e.g. ~/.aws/credentials of the user running the upload), never this repo or envvars.sh.
+    S3_BUCKET = "scverse-exampledata"
+    S3_PREFIX = "spatialdata/spatialdata-sandbox"
+    S3_REGION = "eu-west-1"
+    S3_PUBLIC_URL = "https://exampledata.scverse.org/spatialdata/spatialdata-sandbox"
     ENV = "ome_sdc"
     EMAILS = []
 
