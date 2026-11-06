@@ -80,16 +80,27 @@ def test_prefix_slashes_are_normalised(zip_file):
     assert (BUCKET, ZIP_KEY) in s3.objects
 
 
-def test_other_errors_propagate():
-    class Denied(Exception):
-        response = {"Error": {"Code": "AccessDenied"}}
+def _raising(code):
+    class Error(Exception):
+        response = {"Error": {"Code": code}}
 
     class S3:
         def get_object(self, Bucket, Key):
-            raise Denied()
+            raise Error()
 
-    with pytest.raises(Denied):
-        get_remote_checksum(S3(), BUCKET, "k")
+    return S3(), Error
+
+
+@pytest.mark.parametrize("code", ["AccessDenied", "403"])
+def test_access_denied_counts_as_missing(code):
+    s3, _ = _raising(code)
+    assert get_remote_checksum(s3, BUCKET, "k") is None
+
+
+def test_other_errors_propagate():
+    s3, error = _raising("InternalError")
+    with pytest.raises(error):
+        get_remote_checksum(s3, BUCKET, "k")
 
 
 def test_rejects_non_sha256_checksum(zip_file):

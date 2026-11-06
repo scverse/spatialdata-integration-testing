@@ -21,7 +21,7 @@ def make_client(region: str):
 
 def _is_missing(error: Exception) -> bool:
     response = getattr(error, "response", None) or {}
-    return response.get("Error", {}).get("Code") in ("NoSuchKey", "404", "NotFound")
+    return response.get("Error", {}).get("Code") in ("NoSuchKey", "404", "NotFound", "AccessDenied", "403")
 
 
 def get_remote_checksum(s3, bucket: str, key: str) -> str | None:
