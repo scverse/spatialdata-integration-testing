@@ -94,15 +94,14 @@ WORKSPACE="${WORKSPACE/#\~/$HOME}"
 [[ "$WORKSPACE" = /* ]] || WORKSPACE="$PACKAGE_PATH/$WORKSPACE"
 echo "Repositories (workspace): $WORKSPACE"
 
-# One pip call for all repos, so they are resolved together (the others use the local spatialdata).
-# Test dependencies are PEP 735 dependency groups (`--group`; pip silently ignores them in
-# `repo[test]`), except napari-spatialdata, which still declares a setup.cfg extra.
+PACKAGES=(
+    -e "$WORKSPACE/spatialdata" --group "$WORKSPACE/spatialdata/pyproject.toml:test"
+    -e "$WORKSPACE/spatialdata-io" --group "$WORKSPACE/spatialdata-io/pyproject.toml:test"
+    -e "$WORKSPACE/spatialdata-plot" --group "$WORKSPACE/spatialdata-plot/pyproject.toml:test"
+    -e "$WORKSPACE/squidpy" --group "$WORKSPACE/squidpy/pyproject.toml:test"
+    -e "$WORKSPACE/napari-spatialdata[test]"  # a setup.cfg extra, not a dependency group
+)
+# one call, so all repos resolve against the local spatialdata
 set -o pipefail
-{ pip install \
-    -e "$WORKSPACE/spatialdata" --group "$WORKSPACE/spatialdata/pyproject.toml:test" \
-    -e "$WORKSPACE/spatialdata-io" --group "$WORKSPACE/spatialdata-io/pyproject.toml:test" \
-    -e "$WORKSPACE/spatialdata-plot" --group "$WORKSPACE/spatialdata-plot/pyproject.toml:test" \
-    -e "$WORKSPACE/squidpy" --group "$WORKSPACE/squidpy/pyproject.toml:test" \
-    -e "$WORKSPACE/napari-spatialdata[test]" \
-    2>&1 1>&3 | awk '{print > "/dev/stderr"} /does not provide the extra/ {bad=1} END {exit bad}'; } 3>&1  # fail if pip warns about a missing extra (stderr only)
+{ pip install "${PACKAGES[@]}" 2>&1 1>&3 | awk '{print > "/dev/stderr"} /does not provide the extra/ {bad=1} END {exit bad}'; } 3>&1  # fail if pip warns about a missing extra (stderr only)
 echo "success!"
