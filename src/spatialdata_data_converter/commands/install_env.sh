@@ -93,10 +93,15 @@ WORKSPACE="${SDC_WORKSPACE:-$PACKAGE_PATH/dependencies}"
 WORKSPACE="${WORKSPACE/#\~/$HOME}"
 [[ "$WORKSPACE" = /* ]] || WORKSPACE="$PACKAGE_PATH/$WORKSPACE"
 echo "Repositories (workspace): $WORKSPACE"
-pip install -e "$WORKSPACE/spatialdata[test,docs]"
-pip install -e "$WORKSPACE/spatialdata-io[test,doc]"
-pip install -e "$WORKSPACE/spatialdata-plot[test]"
-pip install -e "$WORKSPACE/napari-spatialdata[test]"
-pip install -e "$WORKSPACE/squidpy[test]"
-# pip install squidpy
+
+PACKAGES=(
+    -e "$WORKSPACE/spatialdata" --group "$WORKSPACE/spatialdata/pyproject.toml:test"
+    -e "$WORKSPACE/spatialdata-io" --group "$WORKSPACE/spatialdata-io/pyproject.toml:test"
+    -e "$WORKSPACE/spatialdata-plot" --group "$WORKSPACE/spatialdata-plot/pyproject.toml:test"
+    -e "$WORKSPACE/squidpy" --group "$WORKSPACE/squidpy/pyproject.toml:test"
+    -e "$WORKSPACE/napari-spatialdata[test]"  # still a setup.cfg extra, not a dependency group
+)
+# one call: a conflict with the local spatialdata fails instead of silently pulling it from PyPI
+set -o pipefail
+{ pip install "${PACKAGES[@]}" 2>&1 1>&3 | awk '{print > "/dev/stderr"} /does not provide the extra/ {bad=1} END {exit bad}'; } 3>&1  # fail if pip warns about a missing extra (stderr only)
 echo "success!"
