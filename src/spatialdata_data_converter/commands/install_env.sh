@@ -93,10 +93,32 @@ WORKSPACE="${SDC_WORKSPACE:-$PACKAGE_PATH/dependencies}"
 WORKSPACE="${WORKSPACE/#\~/$HOME}"
 [[ "$WORKSPACE" = /* ]] || WORKSPACE="$PACKAGE_PATH/$WORKSPACE"
 echo "Repositories (workspace): $WORKSPACE"
-pip install -e "$WORKSPACE/spatialdata[test,docs]"
-pip install -e "$WORKSPACE/spatialdata-io[test,doc]"
-pip install -e "$WORKSPACE/spatialdata-plot[test]"
-pip install -e "$WORKSPACE/napari-spatialdata[test]"
-pip install -e "$WORKSPACE/squidpy[test]"
+
+# install_repo <repo> <name>...: editable install of <repo> plus its test/doc dependencies.
+# Each <name> is installed as a PEP 735 dependency group if the repo's pyproject.toml defines
+# one by that name (most scverse repos moved their test deps there; `pip install -e repo[test]`
+# silently ignores groups), otherwise as an extra (e.g. napari-spatialdata's setup.cfg extras).
+# The groups matter: e.g. spatialdata-plot and squidpy cap matplotlib<3.11 for their image tests.
+install_repo() {
+    local repo="$WORKSPACE/$1"; shift
+    local extras=() groups=() name
+    for name in "$@"; do
+        if python -c "import sys, tomllib; sys.exit(sys.argv[2] not in tomllib.load(open(sys.argv[1], 'rb')).get('dependency-groups', {}))" "$repo/pyproject.toml" "$name"; then
+            groups+=(--group "$repo/pyproject.toml:$name")
+        else
+            extras+=("$name")
+        fi
+    done
+    local spec="$repo"
+    [[ ${#extras[@]} -gt 0 ]] && spec="$repo[$(IFS=,; echo "${extras[*]}")]"
+    echo "pip install -e $spec ${groups[*]}"
+    pip install -e "$spec" "${groups[@]}"
+}
+
+install_repo spatialdata test docs
+install_repo spatialdata-io test doc
+install_repo spatialdata-plot test
+install_repo napari-spatialdata test
+install_repo squidpy test
 # pip install squidpy
 echo "success!"
