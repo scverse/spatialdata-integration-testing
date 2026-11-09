@@ -9,7 +9,8 @@ dag = DAG(
     default_args=default_args,
     description='Regenerate dev datasets',
     schedule=None,
-    catchup=False
+    catchup=False,
+    is_paused_upon_creation=True,  # regenerates the shared dev datasets: run deliberately
 )
 
 update_dev_datasets = BashOperator(
@@ -30,7 +31,8 @@ download_spatialdata_io_datasets_dag = DAG(
     default_args=default_args,
     description='Download spatialdata-io dev/test datasets',
     schedule=None,
-    catchup=False
+    catchup=False,
+    is_paused_upon_creation=False,
 )
 
 download_spatialdata_io_datasets = BashOperator(

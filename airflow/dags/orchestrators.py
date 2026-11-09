@@ -17,6 +17,7 @@ orchestrator_first_run = DAG(
     description='First run: setup repos, symlinks, env, then download all data',
     schedule=None,
     catchup=False,
+    is_paused_upon_creation=False,
     max_active_runs=1,  # runs share one workspace and one ome_sdc env: a second run waits (queued)
 )
 
@@ -63,6 +64,7 @@ orchestrator_test_workflow = DAG(
     description='Test workflow: update repos, env, run tests, convert to zarr, run notebooks',
     schedule='0 0 * * *',  # Every day at midnight
     catchup=False,
+    is_paused_upon_creation=True,  # the only scheduled DAG (nightly): switched on deliberately per instance
     max_active_runs=1,  # runs share one workspace and one ome_sdc env: a second run waits (queued)
     # Per-run branch overrides, forwarded to config_update_repos; empty = use Config.REPOSITORIES.
     # Same syntax as Config.REPOSITORIES: 'main', 'branch-name', 'pr 329', 'tag v0.4.0', 'None' (latest release).

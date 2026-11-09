@@ -10,7 +10,8 @@ dag = DAG(
     default_args=default_args,
     description='Install the environment for the project',
     schedule=None,
-    catchup=False
+    catchup=False,
+    is_paused_upon_creation=False,
 )
 
 run_shell_script = BashOperator(
@@ -38,6 +39,7 @@ dag_update_repos = DAG(
     description='Update all repositories to configured branches',
     schedule=None,
     catchup=False,
+    is_paused_upon_creation=False,
     params=REPOSITORY_PARAMS,
 )
 
@@ -57,7 +59,8 @@ dag_create_symlinks = DAG(
     default_args=default_args,
     description='Create symlinks between sandbox datasets and notebooks',
     schedule=None,
-    catchup=False
+    catchup=False,
+    is_paused_upon_creation=False,
 )
 
 create_symlinks_task = BashOperator(
