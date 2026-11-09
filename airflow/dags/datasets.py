@@ -16,7 +16,8 @@ for dataset in Config.DATASETS:
             default_args=default_args,
             description=f'Download data for {dataset}',
             schedule=None,
-            catchup=False
+            catchup=False,
+            is_paused_upon_creation=False,
         )
 
         run_download_script = BashOperator(
@@ -38,7 +39,8 @@ for dataset in Config.DATASETS:
             default_args=default_args,
             description=f'Convert data for {dataset} to zarr',
             schedule=None,
-            catchup=False
+            catchup=False,
+            is_paused_upon_creation=False,
         )
 
         run_to_zarr_script = BashOperator(
@@ -60,7 +62,8 @@ for dataset in Config.DATASETS:
             default_args=default_args,
             description=f'Upload data for {dataset} to S3',
             schedule=None,
-            catchup=False
+            catchup=False,
+            is_paused_upon_creation=True,  # publishes to S3: switched on deliberately per instance
         )
 
         run_upload_script = BashOperator(
@@ -80,7 +83,8 @@ download_all = DAG(
     default_args=default_args,
     description='Trigger all the download tasks',
     schedule=None,
-    catchup=False
+    catchup=False,
+    is_paused_upon_creation=False,
 )
 for dataset in Config.DATASETS:
     if dataset not in Config.DATASETS_NO_DOWNLOAD:
@@ -106,7 +110,8 @@ to_zarr_all = DAG(
     default_args=default_args,
     description='Trigger all the to_zarr tasks',
     schedule=None,
-    catchup=False
+    catchup=False,
+    is_paused_upon_creation=False,
 )
 for dataset in Config.DATASETS:
     if dataset in Config.DATASETS_NO_TO_ZARR:
@@ -125,7 +130,8 @@ upload_all = DAG(
     default_args=default_args,
     description='Trigger all the upload tasks',
     schedule=None,
-    catchup=False
+    catchup=False,
+    is_paused_upon_creation=True,  # publishes to S3: switched on deliberately per instance
 )
 for dataset in Config.DATASETS:
     if dataset in Config.DATASETS_NO_UPLOAD:
