@@ -22,8 +22,7 @@ for notebook in docs_notebooks:
         default_args=default_args,
         description=f'Run notebook {notebook}',
         schedule=None,
-        catchup=False,
-        is_paused_upon_creation=False,
+        catchup=False
     )
 
     notebook_task = BashOperator(
@@ -75,8 +74,7 @@ notebook_docs_all = DAG(
     default_args=default_args,
     description='Trigger all the notebook tasks for docs notebooks (lightweight)',
     schedule=None,
-    catchup=False,
-    is_paused_upon_creation=False,
+    catchup=False
 )
 for notebook in docs_notebooks:
     trigger = TriggerUnpausedDagRunOperator(
