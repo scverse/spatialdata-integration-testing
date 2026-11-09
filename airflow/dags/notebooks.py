@@ -1,7 +1,7 @@
 import os
 from airflow import DAG
 from airflow.providers.standard.operators.bash import BashOperator
-from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator
+from spatialdata_data_converter.airflow_operators import TriggerUnpausedDagRunOperator
 from spatialdata_data_converter.config import Config, get_airflow_default_args, get_cli_command
 
 default_args = get_airflow_default_args()
@@ -22,7 +22,8 @@ for notebook in docs_notebooks:
         default_args=default_args,
         description=f'Run notebook {notebook}',
         schedule=None,
-        catchup=False
+        catchup=False,
+        is_paused_upon_creation=False,
     )
 
     notebook_task = BashOperator(
@@ -74,10 +75,11 @@ notebook_docs_all = DAG(
     default_args=default_args,
     description='Trigger all the notebook tasks for docs notebooks (lightweight)',
     schedule=None,
-    catchup=False
+    catchup=False,
+    is_paused_upon_creation=False,
 )
 for notebook in docs_notebooks:
-    trigger = TriggerDagRunOperator(
+    trigger = TriggerUnpausedDagRunOperator(
         task_id=f'trigger_notebook_{notebook}_from_notebook_docs_all',
         trigger_dag_id=f'notebook_{notebook}',
         wait_for_completion=True,

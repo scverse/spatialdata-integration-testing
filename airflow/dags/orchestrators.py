@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator
+from spatialdata_data_converter.airflow_operators import TriggerUnpausedDagRunOperator
 from airflow.sdk import Param
 from spatialdata_data_converter.config import Config, get_airflow_default_args
 
@@ -17,31 +17,32 @@ orchestrator_first_run = DAG(
     description='First run: setup repos, symlinks, env, then download all data',
     schedule=None,
     catchup=False,
+    is_paused_upon_creation=False,
     max_active_runs=1,  # runs share one workspace and one ome_sdc env: a second run waits (queued)
 )
 
-first_run_update_repos = TriggerDagRunOperator(
+first_run_update_repos = TriggerUnpausedDagRunOperator(
     task_id='trigger_config_update_repos',
     trigger_dag_id='config_update_repos',
     wait_for_completion=True,
     dag=orchestrator_first_run,
 )
 
-first_run_create_symlinks = TriggerDagRunOperator(
+first_run_create_symlinks = TriggerUnpausedDagRunOperator(
     task_id='trigger_config_create_symlinks',
     trigger_dag_id='config_create_symlinks',
     wait_for_completion=True,
     dag=orchestrator_first_run,
 )
 
-first_run_install_env = TriggerDagRunOperator(
+first_run_install_env = TriggerUnpausedDagRunOperator(
     task_id='trigger_config_install_env',
     trigger_dag_id='config_install_env',
     wait_for_completion=True,
     dag=orchestrator_first_run,
 )
 
-first_run_download_all = TriggerDagRunOperator(
+first_run_download_all = TriggerUnpausedDagRunOperator(
     task_id='trigger_download_all',
     trigger_dag_id='download_all',
     wait_for_completion=True,
@@ -63,6 +64,7 @@ orchestrator_test_workflow = DAG(
     description='Test workflow: update repos, env, run tests, convert to zarr, run notebooks',
     schedule='0 0 * * *',  # Every day at midnight
     catchup=False,
+    is_paused_upon_creation=True,  # nightly: switched on deliberately per instance (dev + prod at once -> OOM, 3 Nov)
     max_active_runs=1,  # runs share one workspace and one ome_sdc env: a second run waits (queued)
     # Per-run branch overrides, forwarded to config_update_repos; empty = use Config.REPOSITORIES.
     # Same syntax as Config.REPOSITORIES: 'main', 'branch-name', 'pr 329', 'tag v0.4.0', 'None' (latest release).
@@ -76,7 +78,7 @@ orchestrator_test_workflow = DAG(
     },
 )
 
-test_workflow_update_repos = TriggerDagRunOperator(
+test_workflow_update_repos = TriggerUnpausedDagRunOperator(
     task_id='trigger_config_update_repos',
     trigger_dag_id='config_update_repos',
     conf={repo: "{{ params['%s'] or '' }}" % repo for repo in Config.REPOSITORIES},
@@ -84,28 +86,28 @@ test_workflow_update_repos = TriggerDagRunOperator(
     dag=orchestrator_test_workflow,
 )
 
-test_workflow_install_env = TriggerDagRunOperator(
+test_workflow_install_env = TriggerUnpausedDagRunOperator(
     task_id='trigger_config_install_env',
     trigger_dag_id='config_install_env',
     wait_for_completion=True,
     dag=orchestrator_test_workflow,
 )
 
-test_workflow_tests_all = TriggerDagRunOperator(
+test_workflow_tests_all = TriggerUnpausedDagRunOperator(
     task_id='trigger_tests_all',
     trigger_dag_id='tests_all',
     wait_for_completion=True,
     dag=orchestrator_test_workflow,
 )
 
-test_workflow_to_zarr_all = TriggerDagRunOperator(
+test_workflow_to_zarr_all = TriggerUnpausedDagRunOperator(
     task_id='trigger_to_zarr_all',
     trigger_dag_id='to_zarr_all',
     wait_for_completion=True,
     dag=orchestrator_test_workflow,
 )
 
-test_workflow_notebook_docs_all = TriggerDagRunOperator(
+test_workflow_notebook_docs_all = TriggerUnpausedDagRunOperator(
     task_id='trigger_notebook_docs_all',
     trigger_dag_id='notebook_docs_all',
     wait_for_completion=True,

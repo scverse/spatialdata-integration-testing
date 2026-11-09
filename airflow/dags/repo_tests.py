@@ -1,6 +1,6 @@
 from airflow import DAG
 from airflow.providers.standard.operators.bash import BashOperator
-from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator
+from spatialdata_data_converter.airflow_operators import TriggerUnpausedDagRunOperator
 from spatialdata_data_converter.config import get_airflow_default_args, get_cli_command
 
 default_args = get_airflow_default_args()
@@ -16,7 +16,8 @@ for repo in TEST_REPOS:
         default_args=default_args,
         description=f'Run tests {repo}',
         schedule=None,
-        catchup=False
+        catchup=False,
+        is_paused_upon_creation=False,
     )
 
     tests_repo = BashOperator(
@@ -37,11 +38,12 @@ tests_all = DAG(
     default_args=default_args,
     description='Trigger all pytest tasks',
     schedule=None,
-    catchup=False
+    catchup=False,
+    is_paused_upon_creation=False,
 )
 
 for repo in TEST_REPOS:
-    trigger = TriggerDagRunOperator(
+    trigger = TriggerUnpausedDagRunOperator(
         task_id=f'trigger_tests_{repo}_from_tests_all',
         trigger_dag_id=f'tests_{repo}',
         wait_for_completion=True,
