@@ -24,12 +24,6 @@ def get_env_var(**kwargs) -> str:
     return env_var
 
 
-# Airflow's log viewer folds everything between these two markers into a
-# collapsible section, so the bulk output is hidden by default and the failure
-# banner printed after it is what you see first.
-GROUP_START = "::group::"
-GROUP_END = "::endgroup::"
-
 SIGNAL_HINTS = {
     signal.SIGTERM: (
         "Airflow stops tasks with SIGTERM when they hit their execution_timeout, when "
@@ -100,9 +94,8 @@ def run_subprocess(cmd: str, env: str | None, update_repos: bool = True, **kwarg
         )
     full_cmd = f'bash -c "{cmd_env}{cmd}"'
 
-    # prints the stdout as it is produced, folded into a log group
-    print(f"{GROUP_START}Output of: {cmd[:120]}", flush=True)
-    print(full_cmd)
+    # prints the stdout as it is produced
+    print(full_cmd, flush=True)
     process = subprocess.Popen(
         full_cmd,
         shell=True,
@@ -121,7 +114,6 @@ def run_subprocess(cmd: str, env: str | None, update_repos: bool = True, **kwarg
     def _on_term(signum, frame):
         process.terminate()
         minutes = (time.monotonic() - started) / 60
-        print(GROUP_END)
         title, hints = _describe_returncode(-signum)
         _print_banner(title, [f"after {minutes:.1f} min while running: {cmd[:200]}", *hints, "", "Last output:", *output[-15:]])
         sys.exit(128 + signum)
@@ -143,7 +135,6 @@ def run_subprocess(cmd: str, env: str | None, update_repos: bool = True, **kwarg
         if previous is not None:
             signal.signal(signal.SIGTERM, previous)
 
-    print(GROUP_END, flush=True)
     if process.returncode != 0:
         title, hints = _describe_returncode(process.returncode)
         _print_banner(title, [f"command: {cmd[:200]}", *[h for h in hints if h], "", *_failure_excerpt(output)])
