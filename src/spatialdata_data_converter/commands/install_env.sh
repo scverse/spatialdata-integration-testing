@@ -71,8 +71,10 @@ conda activate $ENV
 # echo "-------- installing supporting libraries --------"
 # TODO: ideally we won't need all these packages. They should either be dependencies of spatialdata-data-converter or add as extras when installing the (napari-)spatialdata(-io|-plot) packages
 # fontconfig is a requirement of vispy when running pytest
+# no conda-forge `pyqt` here: it is PyQt5 (Qt 5.15), but napari>=0.10 needs Qt>=6.7, and qtpy would pick PyQt5
+# over a Qt6 binding; napari[pyqt6] (pip, below) provides the Qt binding instead
 mamba install pytorch torchvision torchaudio cpuonly rclone joblib -c pytorch -c conda-forge -y
-mamba install -c conda-forge nbconvert pytest pytest-xdist jupyter ipywidgets jupyterlab chardet unzip papermill watermark python-igraph leidenalg rclone pytorch-lightning monai pyqt fontconfig -y
+mamba install -c conda-forge nbconvert pytest pytest-xdist jupyter ipywidgets jupyterlab chardet unzip papermill watermark python-igraph leidenalg rclone pytorch-lightning monai fontconfig -y
 pip install jupyter-black watermark
 
 echo "-------- installing spatialdata and related libraries --------"
@@ -100,6 +102,7 @@ PACKAGES=(
     -e "$WORKSPACE/spatialdata-plot" --group "$WORKSPACE/spatialdata-plot/pyproject.toml:test"
     -e "$WORKSPACE/squidpy" --group "$WORKSPACE/squidpy/pyproject.toml:test"
     -e "$WORKSPACE/napari-spatialdata[test]"  # still a setup.cfg extra, not a dependency group
+    "napari[pyqt6]"  # Qt binding for napari(-spatialdata) tests; napari pins compatible PyQt6/Qt versions
 )
 # one call: a conflict with the local spatialdata fails instead of silently pulling it from PyPI
 set -o pipefail
