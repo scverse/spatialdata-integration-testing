@@ -1,6 +1,6 @@
 from airflow import DAG
 from airflow.providers.standard.operators.bash import BashOperator
-from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator
+from spatialdata_data_converter.airflow_operators import TriggerUnpausedDagRunOperator
 from spatialdata_data_converter.config import Config, get_airflow_default_args, get_cli_command
 
 default_args = get_airflow_default_args()
@@ -84,7 +84,7 @@ download_all = DAG(
 )
 for dataset in Config.DATASETS:
     if dataset not in Config.DATASETS_NO_DOWNLOAD:
-        trigger = TriggerDagRunOperator(
+        trigger = TriggerUnpausedDagRunOperator(
             task_id=f'trigger_download_{dataset}_from_download_all',
             trigger_dag_id=f'download_{dataset}',
             wait_for_completion=True,
@@ -92,7 +92,7 @@ for dataset in Config.DATASETS:
         )
 
 # Also trigger spatialdata-io datasets download
-trigger_spatialdata_io_datasets = TriggerDagRunOperator(
+trigger_spatialdata_io_datasets = TriggerUnpausedDagRunOperator(
     task_id='trigger_download_spatialdata_io_datasets_from_download_all',
     trigger_dag_id='download_spatialdata_io_datasets',
     wait_for_completion=True,
@@ -111,7 +111,7 @@ to_zarr_all = DAG(
 for dataset in Config.DATASETS:
     if dataset in Config.DATASETS_NO_TO_ZARR:
         continue
-    trigger = TriggerDagRunOperator(
+    trigger = TriggerUnpausedDagRunOperator(
         task_id=f'trigger_to_zarr_{dataset}_from_to_zarr_all',
         trigger_dag_id=f'to_zarr_{dataset}',
         wait_for_completion=True,
@@ -130,7 +130,7 @@ upload_all = DAG(
 for dataset in Config.DATASETS:
     if dataset in Config.DATASETS_NO_UPLOAD:
         continue
-    trigger = TriggerDagRunOperator(
+    trigger = TriggerUnpausedDagRunOperator(
         task_id=f'trigger_upload_{dataset}_from_upload_all',
         trigger_dag_id=f'upload_{dataset}',
         wait_for_completion=True,
