@@ -106,6 +106,10 @@ class Config:
         "xenium_prime_cervical_3.0.0_io",
     ]
     DATASETS_NO_DOWNLOAD = []
+    # datasets with a download_<dataset> DAG that download_all leaves out: run them by hand when needed
+    # (xenium_prime_cervical_3.0.0_io is ~75 GB of raw data only the manually run
+    # create_cells_dataset notebook uses)
+    DATASETS_MANUAL_DOWNLOAD = ["xenium_prime_cervical_3.0.0_io"]
     # datasets that are downloaded but have no to_zarr.py / are not published on S3
     DATASETS_NO_TO_ZARR = ["xenium_prime_cervical_3.0.0_io"]
     DATASETS_NO_UPLOAD = ["xenium_prime_cervical_3.0.0_io"]

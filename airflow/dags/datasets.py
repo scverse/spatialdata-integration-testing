@@ -78,6 +78,7 @@ for dataset in Config.DATASETS:
 
 # --------- download all datasets ---------
 # Creation of a 'download_all' DAG that triggers all 'download_{dataset}' DAGs
+# (except Config.DATASETS_MANUAL_DOWNLOAD, which are downloaded by hand when needed)
 download_all = DAG(
     'download_all',
     default_args=default_args,
@@ -87,7 +88,7 @@ download_all = DAG(
     is_paused_upon_creation=False,
 )
 for dataset in Config.DATASETS:
-    if dataset not in Config.DATASETS_NO_DOWNLOAD:
+    if dataset not in Config.DATASETS_NO_DOWNLOAD and dataset not in Config.DATASETS_MANUAL_DOWNLOAD:
         trigger = TriggerUnpausedDagRunOperator(
             task_id=f'trigger_download_{dataset}_from_download_all',
             trigger_dag_id=f'download_{dataset}',
