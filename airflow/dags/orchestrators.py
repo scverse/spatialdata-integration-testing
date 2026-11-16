@@ -1,3 +1,5 @@
+import os
+
 from airflow import DAG
 from spatialdata_data_converter.airflow_operators import TriggerUnpausedDagRunOperator
 from airflow.sdk import Param
@@ -62,7 +64,8 @@ orchestrator_test_workflow = DAG(
     '0_orchestrator_test_workflow',
     default_args=default_args,
     description='Test workflow: update repos, env, run tests, convert to zarr, run notebooks',
-    schedule='0 0 * * *',  # Every day at midnight
+    # Every day at midnight (UTC); an instance can set its own cron, or '' for manual runs only.
+    schedule=os.environ.get('SDC_TEST_WORKFLOW_SCHEDULE', '0 0 * * *') or None,
     catchup=False,
     is_paused_upon_creation=True,  # the only scheduled DAG (nightly): switched on deliberately per instance
     max_active_runs=1,  # runs share one workspace and one ome_sdc env: a second run waits (queued)
