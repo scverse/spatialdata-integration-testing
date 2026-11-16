@@ -102,6 +102,7 @@ PACKAGES=(
     -e "$WORKSPACE/spatialdata-plot" --group "$WORKSPACE/spatialdata-plot/pyproject.toml:test"
     -e "$WORKSPACE/squidpy" --group "$WORKSPACE/squidpy/pyproject.toml:test"
     -e "$WORKSPACE/napari-spatialdata[test,all]"  # setup.cfg extras; `all` brings the Qt binding
+    --group "$WORKSPACE/spatialdata-notebooks/pyproject.toml:examples"  # what the docs notebooks import
 )
 # one call: a conflict with the local spatialdata fails instead of silently pulling it from PyPI
 set -o pipefail
