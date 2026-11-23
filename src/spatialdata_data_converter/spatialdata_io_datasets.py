@@ -19,7 +19,7 @@ SPATIALDATA_IO_DEV_DATASETS = {
     # 10x Genomics Visium HD 4.0.1 (CC BY 4.0 license)
     'Visium_HD_Tiny_3prime_Dataset_outs': 'https://cf.10xgenomics.com/samples/spatial-exp/4.0.1/Visium_HD_Tiny_3prime_Dataset/Visium_HD_Tiny_3prime_Dataset_outs.zip',
     # Spatial Genomics seqFISH v2 (permission granted for public use)
-    'seqfish-2-test-dataset': 'https://s3.embl.de/spatialdata/raw_data/seqfish-2-test-dataset.zip',
+    'seqfish-2-test-dataset': 'https://exampledata.scverse.org/spatialdata/raw_data/seqfish-2-test-dataset.zip',
 }
 
 
